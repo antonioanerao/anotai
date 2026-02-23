@@ -211,7 +211,7 @@ export function PadEditor({
         highlight={(code) => highlightCode(code, language)}
         padding={16}
         readOnly={!canEdit}
-        className="min-h-[65vh] w-full overflow-auto rounded-lg border border-slate-300 bg-white"
+        className="pad-code-editor min-h-[65vh] w-full overflow-auto rounded-lg border border-slate-300 bg-white"
         textareaClassName="font-mono text-sm leading-6 text-slate-900 outline-none"
         preClassName="font-mono text-sm leading-6"
         style={{

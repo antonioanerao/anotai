@@ -9,3 +9,24 @@
 body {
   @apply min-h-screen bg-slate-50 text-slate-900;
 }
+
+.pad-code-editor {
+  overflow-x: auto !important;
+  overflow-y: auto !important;
+}
+
+.pad-code-editor textarea,
+.pad-code-editor pre {
+  white-space: pre !important;
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+  min-width: 100% !important;
+}
+
+.pad-code-editor pre {
+  width: max-content !important;
+}
+
+.pad-code-editor textarea {
+  width: max-content !important;
+}
