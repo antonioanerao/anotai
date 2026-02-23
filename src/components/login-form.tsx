@@ -4,6 +4,24 @@ import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
+function getSafeCallbackPath(rawCallbackUrl: string | null): string {
+  if (!rawCallbackUrl) return "/";
+
+  if (rawCallbackUrl.startsWith("/")) {
+    return rawCallbackUrl;
+  }
+
+  try {
+    const parsed = new URL(rawCallbackUrl);
+    if (parsed.origin !== window.location.origin) {
+      return "/";
+    }
+    return `${parsed.pathname}${parsed.search}${parsed.hash}` || "/";
+  } catch {
+    return "/";
+  }
+}
+
 export function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -11,18 +29,18 @@ export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") ?? "/";
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
     setIsLoading(true);
+    const callbackPath = getSafeCallbackPath(searchParams.get("callbackUrl"));
 
     const result = await signIn("credentials", {
       email,
       password,
       redirect: false,
-      callbackUrl
+      callbackUrl: callbackPath
     });
 
     setIsLoading(false);
@@ -32,7 +50,7 @@ export function LoginForm() {
       return;
     }
 
-    router.push(result.url ?? callbackUrl);
+    router.replace(callbackPath);
     router.refresh();
   }
 
