@@ -29,10 +29,10 @@ services:
     ports:
       - "3000:3000"
     environment:
-      DATABASE_URL: postgresql://dotpad:dotpad@db:5432/dotpad?schema=public
-      AUTH_SECRET: change-me
-      NEXTAUTH_URL: http://localhost:3000
-      PRIMARY_ADMIN_EMAIL: admin@example.com
+      DATABASE_URL: ${DATABASE_URL:-postgresql://dotpad:dotpad@db:5432/dotpad?schema=public}
+      AUTH_SECRET: ${AUTH_SECRET}
+      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
+      PRIMARY_ADMIN_EMAIL: ${PRIMARY_ADMIN_EMAIL}
 
 volumes:
   postgres_data:
