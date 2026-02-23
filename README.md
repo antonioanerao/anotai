@@ -15,6 +15,8 @@ Projeto AnotAI: editor compartilhavel de notas/codigo com leitura publica, permi
 - Painel admin para:
   - Ligar/desligar cadastro publico (`allowPublicSignup`)
   - Criar contas mesmo com cadastro publico desligado
+  - Listar usuarios cadastrados (somente leitura)
+  - Listar blocos criados e seus donos (somente leitura)
 - Admin primario por `.env` (`PRIMARY_ADMIN_EMAIL`)
 
 ## Variaveis de ambiente
