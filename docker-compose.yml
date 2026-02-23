@@ -1,0 +1,38 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: dotpad_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: dotpad
+      POSTGRES_USER: dotpad
+      POSTGRES_PASSWORD: dotpad
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dotpad -d dotpad"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dotpad_app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://dotpad:dotpad@db:5432/dotpad?schema=public
+      AUTH_SECRET: change-me
+      NEXTAUTH_URL: http://localhost:3000
+      PRIMARY_ADMIN_EMAIL: admin@example.com
+
+volumes:
+  postgres_data:
