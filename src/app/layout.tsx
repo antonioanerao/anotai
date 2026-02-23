@@ -4,7 +4,7 @@ import "prismjs/themes/prism.css";
 import { AppHeader } from "@/components/app-header";
 
 export const metadata: Metadata = {
-  title: "Dotpad",
+  title: "AnotAI",
   description: "Compartilhe notas por URL com controle de edicao"
 };
 

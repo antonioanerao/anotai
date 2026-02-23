@@ -1,7 +1,7 @@
 services:
   db:
     image: postgres:16-alpine
-    container_name: dotpad_db
+    container_name: anotai_db
     restart: unless-stopped
     environment:
       POSTGRES_DB: dotpad
@@ -21,7 +21,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: dotpad_app
+    container_name: anotai_app
     restart: unless-stopped
     depends_on:
       db:

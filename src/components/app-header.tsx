@@ -16,7 +16,7 @@ export async function AppHeader() {
       <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-3">
         <Link href="/" className="flex items-center gap-2 text-lg font-semibold text-brand-700">
           <span className="inline-block h-2.5 w-2.5 rounded-full bg-brand-500" />
-          Dotpad
+          AnotAI
         </Link>
 
         <nav className="flex items-center gap-2">

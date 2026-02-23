@@ -1,6 +1,6 @@
-# Dotpad Copia
+# AnotAI
 
-Clone funcional do DontPad usando Next.js + Tailwind + Auth.js + Prisma + PostgreSQL.
+Projeto AnotAI: editor compartilhavel de notas/codigo com leitura publica, permissoes de edicao e autenticacao.
 
 ## Funcionalidades MVP
 

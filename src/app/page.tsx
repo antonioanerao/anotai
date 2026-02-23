@@ -12,7 +12,7 @@ export default async function HomePage() {
   return (
     <div className="space-y-8">
       <section className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Dotpad</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900">AnotAI</h1>
         <p className="max-w-2xl text-slate-600">
           Compartilhe texto por URL. Quem estiver deslogado pode apenas acompanhar e copiar. Quem estiver
           logado pode editar conforme as permissoes do bloco.
