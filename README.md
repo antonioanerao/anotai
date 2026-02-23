@@ -18,6 +18,7 @@ Projeto AnotAI: editor compartilhavel de notas/codigo com leitura publica, permi
   - Listar usuarios cadastrados (somente leitura)
   - Listar blocos criados e seus donos
   - Excluir blocos com confirmacao
+- Usuario autenticado pode alterar a propria senha (senha atual, nova e confirmacao)
 - Admin primario por `.env` (`PRIMARY_ADMIN_EMAIL`)
 
 ## Variaveis de ambiente

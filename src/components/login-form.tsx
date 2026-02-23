@@ -3,6 +3,7 @@
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { PASSWORD_MIN_LENGTH } from "@/lib/password-policy";
 
 function getSafeCallbackPath(rawCallbackUrl: string | null): string {
   if (!rawCallbackUrl) return "/";
@@ -80,7 +81,7 @@ export function LoginForm() {
           value={password}
           onChange={(event) => setPassword(event.target.value)}
           required
-          minLength={8}
+          minLength={PASSWORD_MIN_LENGTH}
           className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none ring-brand-500 transition focus:ring"
         />
       </div>

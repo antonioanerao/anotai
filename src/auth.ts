@@ -3,10 +3,11 @@ import Credentials from "next-auth/providers/credentials";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { verifyPassword } from "@/lib/password";
+import { PASSWORD_MIN_LENGTH } from "@/lib/password-policy";
 
 const credentialSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(8)
+  password: z.string().min(PASSWORD_MIN_LENGTH)
 });
 
 function normalizeEmail(email: string): string {

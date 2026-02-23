@@ -29,6 +29,12 @@ export async function AppHeader() {
 
           {isLogged ? (
             <>
+              <Link
+                href="/account"
+                className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+              >
+                Conta
+              </Link>
               {session?.user.role === "ADMIN" && (
                 <Link
                   href="/admin"
