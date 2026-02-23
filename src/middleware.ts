@@ -1,9 +1,13 @@
-import { NextResponse } from "next/server";
-import { auth } from "@/auth";
+import { NextRequest, NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
 
-export default auth((request) => {
-  const isLoggedIn = Boolean(request.auth?.user);
-  const role = request.auth?.user?.role;
+export default async function middleware(request: NextRequest) {
+  const token = await getToken({
+    req: request,
+    secret: process.env.AUTH_SECRET
+  });
+  const isLoggedIn = Boolean(token?.sub);
+  const role = token?.role;
 
   if (request.nextUrl.pathname.startsWith("/admin")) {
     if (!isLoggedIn) {
@@ -22,7 +26,7 @@ export default auth((request) => {
   }
 
   return NextResponse.next();
-});
+}
 
 export const config = {
   matcher: ["/admin/:path*", "/pads/new"]
