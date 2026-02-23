@@ -15,6 +15,7 @@ enum UserRole {
 enum EditMode {
   OWNER_ONLY
   COLLABORATIVE
+  ANONYMOUS
 }
 
 enum CodeLanguage {

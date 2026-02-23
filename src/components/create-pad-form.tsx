@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-type EditMode = "OWNER_ONLY" | "COLLABORATIVE";
+type EditMode = "OWNER_ONLY" | "COLLABORATIVE" | "ANONYMOUS";
 
 export function CreatePadForm() {
   const [slug, setSlug] = useState("");
@@ -69,6 +69,15 @@ export function CreatePadForm() {
             onChange={() => setEditMode("COLLABORATIVE")}
           />
           Qualquer usuario logado pode editar
+        </label>
+        <label className="flex items-center gap-2 text-sm text-slate-700">
+          <input
+            type="radio"
+            name="editMode"
+            checked={editMode === "ANONYMOUS"}
+            onChange={() => setEditMode("ANONYMOUS")}
+          />
+          Qualquer pessoa pode editar (mesmo sem login)
         </label>
       </fieldset>
 

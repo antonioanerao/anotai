@@ -9,6 +9,7 @@ export function canEditPad(params: {
   ownerId: string;
   editMode: EditMode;
 }): boolean {
+  if (params.editMode === "ANONYMOUS") return true;
   if (!params.userId) return false;
   if (params.editMode === "COLLABORATIVE") return true;
   return params.userId === params.ownerId;

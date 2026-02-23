@@ -6,7 +6,7 @@ import { useMemo, useState } from "react";
 type PadRow = {
   id: string;
   slug: string;
-  editMode: "OWNER_ONLY" | "COLLABORATIVE";
+  editMode: "OWNER_ONLY" | "COLLABORATIVE" | "ANONYMOUS";
   language: "PLAIN_TEXT" | "PYTHON" | "PHP" | "JAVASCRIPT";
   updatedAt: string;
   owner: {

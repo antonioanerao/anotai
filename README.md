@@ -8,10 +8,11 @@ Projeto AnotAI: editor compartilhavel de notas/codigo com leitura publica, permi
 - Atualizacao em tempo real via polling
 - Seletor de linguagem do bloco (dono do bloco): Texto puro, Python, PHP e JavaScript
 - Highlight de sintaxe no conteudo do bloco
-- Edicao apenas para autenticados
+- Edicao conforme modo de permissao do bloco
 - Modo de permissao por bloco:
   - `OWNER_ONLY`: apenas o criador edita
   - `COLLABORATIVE`: qualquer usuario autenticado edita
+  - `ANONYMOUS`: qualquer pessoa edita (mesmo sem login)
 - Painel admin para:
   - Ligar/desligar cadastro publico (`allowPublicSignup`)
   - Criar contas mesmo com cadastro publico desligado
@@ -70,4 +71,4 @@ Aplicacao: `http://localhost:3000`
 2. Faça login.
 3. Crie um pad com slug e escolha o modo de edicao.
 4. Compartilhe a URL do pad.
-5. Usuarios anonimos acompanham e copiam; usuarios autenticados editam conforme permissao.
+5. Usuarios anonimos acompanham e copiam; no modo `ANONYMOUS`, tambem podem editar.

@@ -31,10 +31,7 @@ export async function GET(_: Request, { params }: Params) {
 
 export async function PATCH(request: Request, { params }: Params) {
   const session = await auth();
-
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Autenticacao obrigatoria." }, { status: 401 });
-  }
+  const userId = session?.user?.id;
 
   const { slug } = await params;
   const pad = await prisma.pad.findUnique({ where: { slug } });
@@ -43,9 +40,9 @@ export async function PATCH(request: Request, { params }: Params) {
     return NextResponse.json({ error: "Bloco nao encontrado." }, { status: 404 });
   }
 
-  const isOwner = session.user.id === pad.ownerId;
+  const isOwner = userId === pad.ownerId;
   const editable = canEditPad({
-    userId: session.user.id,
+    userId,
     ownerId: pad.ownerId,
     editMode: pad.editMode
   });
@@ -65,7 +62,14 @@ export async function PATCH(request: Request, { params }: Params) {
   }
 
   if (wantsContentUpdate && !editable) {
+    if (!userId) {
+      return NextResponse.json({ error: "Autenticacao obrigatoria." }, { status: 401 });
+    }
     return NextResponse.json({ error: "Sem permissao de edicao." }, { status: 403 });
+  }
+
+  if (wantsLanguageUpdate && !userId) {
+    return NextResponse.json({ error: "Autenticacao obrigatoria." }, { status: 401 });
   }
 
   if (wantsLanguageUpdate && !isOwner) {

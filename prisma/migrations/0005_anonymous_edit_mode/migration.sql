@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "EditMode" ADD VALUE IF NOT EXISTS 'ANONYMOUS';
