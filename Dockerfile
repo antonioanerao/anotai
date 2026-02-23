@@ -7,6 +7,8 @@ FROM node:22-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+# Ensure public exists even when repository has no tracked static assets.
+RUN mkdir -p /app/public
 RUN npx prisma generate
 RUN npm run build
 
