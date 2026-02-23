@@ -21,10 +21,19 @@ Projeto AnotAI: editor compartilhavel de notas/codigo com leitura publica, permi
 
 Copie `.env.example` para `.env` e ajuste os valores.
 
-- `DATABASE_URL`
+- `POSTGRES_DB`
+- `POSTGRES_USER`
+- `POSTGRES_PASSWORD`
+- `DB_HOST` (em Docker Compose, normalmente `db`)
+- `DB_SCHEMA` (normalmente `public`)
+- `DB_PORT`
+- `APP_PORT`
 - `AUTH_SECRET`
 - `NEXTAUTH_URL`
 - `PRIMARY_ADMIN_EMAIL`
+
+Observacao: no Compose, `DATABASE_URL` eh montada automaticamente a partir dessas variaveis.  
+Voce pode definir `DATABASE_URL` manualmente apenas se quiser sobrescrever esse comportamento.
 
 ## Rodar localmente (sem Docker)
 
@@ -36,6 +45,14 @@ npm run dev
 ```
 
 ## Rodar com Docker
+
+Crie um compose local a partir do exemplo:
+
+```bash
+cp docker-compose.example.yml docker-compose.yml
+```
+
+Depois suba os servicos:
 
 ```bash
 docker compose up --build
