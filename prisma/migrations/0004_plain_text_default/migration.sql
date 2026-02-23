@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Pad" ALTER COLUMN "language" SET DEFAULT 'PLAIN_TEXT';

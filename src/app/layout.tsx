@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "prismjs/themes/prism.css";
 import { AppHeader } from "@/components/app-header";
 
 export const metadata: Metadata = {

@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "CodeLanguage" ADD VALUE IF NOT EXISTS 'PLAIN_TEXT';

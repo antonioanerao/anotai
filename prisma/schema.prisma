@@ -17,6 +17,13 @@ enum EditMode {
   COLLABORATIVE
 }
 
+enum CodeLanguage {
+  PLAIN_TEXT
+  PYTHON
+  PHP
+  JAVASCRIPT
+}
+
 model User {
   id             String    @id @default(cuid())
   name           String?
@@ -73,6 +80,7 @@ model Pad {
   slug      String   @unique
   content   String   @default("")
   editMode  EditMode @default(OWNER_ONLY)
+  language  CodeLanguage @default(PLAIN_TEXT)
   ownerId   String
   owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())

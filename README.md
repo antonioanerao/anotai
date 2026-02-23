@@ -6,6 +6,8 @@ Clone funcional do DontPad usando Next.js + Tailwind + Auth.js + Prisma + Postgr
 
 - Blocos por URL (`/pads/[slug]`) com leitura publica (sem login)
 - Atualizacao em tempo real via polling
+- Seletor de linguagem do bloco (dono do bloco): Texto puro, Python, PHP e JavaScript
+- Highlight de sintaxe no conteudo do bloco
 - Edicao apenas para autenticados
 - Modo de permissao por bloco:
   - `OWNER_ONLY`: apenas o criador edita
