@@ -7,19 +7,6 @@ export default async function middleware(request: NextRequest) {
     secret: process.env.AUTH_SECRET
   });
   const isLoggedIn = Boolean(token?.sub);
-  const role = token?.role;
-
-  if (request.nextUrl.pathname.startsWith("/admin")) {
-    if (!isLoggedIn) {
-      const loginUrl = new URL("/login", request.url);
-      loginUrl.searchParams.set("callbackUrl", request.nextUrl.pathname);
-      return NextResponse.redirect(loginUrl);
-    }
-
-    if (role !== "ADMIN") {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
-  }
 
   if (request.nextUrl.pathname === "/pads/new" && !isLoggedIn) {
     return NextResponse.redirect(new URL("/login", request.url));
@@ -29,5 +16,5 @@ export default async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/pads/new"]
+  matcher: ["/pads/new"]
 };
