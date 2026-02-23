@@ -1,23 +1,111 @@
 "use client";
 
 import { useState } from "react";
+import {
+  ADMIN_CREATE_USER_FAILED_MESSAGE,
+  ADMIN_CREATE_USER_SUCCESS_MESSAGE,
+  PASSWORD_CONFIRMATION_MISMATCH_MESSAGE,
+  PASSWORD_MAX_LENGTH,
+  PASSWORD_MIN_LENGTH,
+  PASSWORD_LENGTH_HINT,
+  PASSWORD_LIMIT_REACHED_MESSAGE
+} from "@/lib/password-policy";
+
+const MAX_PASSWORD_MESSAGE = PASSWORD_LIMIT_REACHED_MESSAGE;
+
+function isTextInsertionKey(event: React.KeyboardEvent<HTMLInputElement>): boolean {
+  if (event.ctrlKey || event.metaKey || event.altKey) return false;
+  return event.key.length === 1;
+}
+
+function shouldBlockByMaxLength(event: React.KeyboardEvent<HTMLInputElement>): boolean {
+  const target = event.currentTarget;
+  const selectionStart = target.selectionStart ?? 0;
+  const selectionEnd = target.selectionEnd ?? 0;
+  const hasSelection = selectionStart !== selectionEnd;
+  return target.value.length >= PASSWORD_MAX_LENGTH && !hasSelection;
+}
+
+type AdminCreateUserFormState = {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+};
+
+const initialState: AdminCreateUserFormState = {
+  name: "",
+  email: "",
+  password: "",
+  confirmPassword: ""
+};
 
 export function AdminCreateUserForm() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
+  const [form, setForm] = useState<AdminCreateUserFormState>(initialState);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [limitWarning, setLimitWarning] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  function updateField(field: keyof AdminCreateUserFormState, value: string) {
+    const isPasswordField = field === "password" || field === "confirmPassword";
+    if (isPasswordField && value.length < PASSWORD_MAX_LENGTH) {
+      setLimitWarning("");
+    }
+
+    setForm((current) => ({ ...current, [field]: value }));
+  }
+
+  function onPasswordKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+    if (!isTextInsertionKey(event)) return;
+    if (!shouldBlockByMaxLength(event)) return;
+
+    event.preventDefault();
+    setLimitWarning(MAX_PASSWORD_MESSAGE);
+  }
+
+  function onPasswordPaste(event: React.ClipboardEvent<HTMLInputElement>) {
+    const target = event.currentTarget;
+    const pastedText = event.clipboardData.getData("text");
+    const selectionStart = target.selectionStart ?? 0;
+    const selectionEnd = target.selectionEnd ?? 0;
+    const nextLength =
+      target.value.length - (selectionEnd - selectionStart) + pastedText.length;
+
+    if (nextLength <= PASSWORD_MAX_LENGTH) return;
+
+    event.preventDefault();
+    const allowedChars = PASSWORD_MAX_LENGTH - (target.value.length - (selectionEnd - selectionStart));
+    const safeChunk = pastedText.slice(0, Math.max(0, allowedChars));
+    const nextValue =
+      target.value.slice(0, selectionStart) + safeChunk + target.value.slice(selectionEnd);
+
+    const field = target.name as keyof AdminCreateUserFormState;
+    updateField(field, nextValue);
+    setLimitWarning(MAX_PASSWORD_MESSAGE);
+  }
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsLoading(true);
-    setMessage("");
+    setError("");
+    setSuccess("");
+
+    if (form.password !== form.confirmPassword) {
+      setError(PASSWORD_CONFIRMATION_MISMATCH_MESSAGE);
+      setIsLoading(false);
+      return;
+    }
 
     const response = await fetch("/api/admin/users", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password })
+      body: JSON.stringify({
+        name: form.name,
+        email: form.email,
+        password: form.password,
+        confirmPassword: form.confirmPassword
+      })
     });
 
     setIsLoading(false);
@@ -25,14 +113,13 @@ export function AdminCreateUserForm() {
     const payload = (await response.json().catch(() => ({}))) as { error?: string };
 
     if (!response.ok) {
-      setMessage(payload.error ?? "Falha ao criar usuario.");
+      setError(payload.error ?? ADMIN_CREATE_USER_FAILED_MESSAGE);
       return;
     }
 
-    setMessage("Usuario criado.");
-    setName("");
-    setEmail("");
-    setPassword("");
+    setSuccess(ADMIN_CREATE_USER_SUCCESS_MESSAGE);
+    setForm(initialState);
+    setLimitWarning("");
   }
 
   return (
@@ -43,8 +130,8 @@ export function AdminCreateUserForm() {
         </label>
         <input
           id="admin-create-name"
-          value={name}
-          onChange={(event) => setName(event.target.value)}
+          value={form.name}
+          onChange={(event) => updateField("name", event.target.value)}
           className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none ring-brand-500 transition focus:ring"
         />
       </div>
@@ -55,8 +142,8 @@ export function AdminCreateUserForm() {
         </label>
         <input
           id="admin-create-email"
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
+          value={form.email}
+          onChange={(event) => updateField("email", event.target.value)}
           type="email"
           required
           className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none ring-brand-500 transition focus:ring"
@@ -69,14 +156,43 @@ export function AdminCreateUserForm() {
         </label>
         <input
           id="admin-create-password"
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
+          name="password"
+          value={form.password}
+          onChange={(event) => updateField("password", event.target.value)}
+          onKeyDown={onPasswordKeyDown}
+          onPaste={onPasswordPaste}
           type="password"
-          minLength={8}
+          minLength={PASSWORD_MIN_LENGTH}
+          maxLength={PASSWORD_MAX_LENGTH}
           required
           className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none ring-brand-500 transition focus:ring"
         />
       </div>
+
+      <div>
+        <label htmlFor="admin-create-confirm-password" className="mb-1 block text-sm font-medium text-slate-700">
+          Confirmar senha
+        </label>
+        <input
+          id="admin-create-confirm-password"
+          name="confirmPassword"
+          value={form.confirmPassword}
+          onChange={(event) => updateField("confirmPassword", event.target.value)}
+          onKeyDown={onPasswordKeyDown}
+          onPaste={onPasswordPaste}
+          type="password"
+          minLength={PASSWORD_MIN_LENGTH}
+          maxLength={PASSWORD_MAX_LENGTH}
+          required
+          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none ring-brand-500 transition focus:ring"
+        />
+      </div>
+
+      <p className="text-xs text-slate-500">{PASSWORD_LENGTH_HINT}</p>
+
+      {limitWarning && <p className="text-sm text-amber-700">{limitWarning}</p>}
+      {error && <p className="text-sm text-red-600">{error}</p>}
+      {success && <p className="text-sm text-emerald-700">{success}</p>}
 
       <button
         type="submit"
@@ -85,8 +201,6 @@ export function AdminCreateUserForm() {
       >
         {isLoading ? "Criando..." : "Criar usuario"}
       </button>
-
-      {message && <p className="text-sm text-slate-600">{message}</p>}
     </form>
   );
 }

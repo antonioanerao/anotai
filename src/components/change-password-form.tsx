@@ -2,11 +2,17 @@
 
 import { useState } from "react";
 import {
+  NEW_PASSWORD_MUST_BE_DIFFERENT_MESSAGE,
+  PASSWORD_UPDATE_FAILED_MESSAGE,
+  PASSWORD_CONFIRMATION_MISMATCH_MESSAGE,
   PASSWORD_MAX_LENGTH,
-  PASSWORD_MIN_LENGTH
+  PASSWORD_MIN_LENGTH,
+  PASSWORD_LENGTH_HINT,
+  PASSWORD_LIMIT_REACHED_MESSAGE,
+  PASSWORD_UPDATE_SUCCESS_MESSAGE
 } from "@/lib/password-policy";
 
-const MAX_PASSWORD_MESSAGE = `Limite de ${PASSWORD_MAX_LENGTH} caracteres atingido.`;
+const MAX_PASSWORD_MESSAGE = PASSWORD_LIMIT_REACHED_MESSAGE;
 
 function isTextInsertionKey(event: React.KeyboardEvent<HTMLInputElement>): boolean {
   if (event.ctrlKey || event.metaKey || event.altKey) return false;
@@ -82,12 +88,12 @@ export function ChangePasswordForm() {
     setSuccess("");
 
     if (form.newPassword !== form.confirmNewPassword) {
-      setError("A confirmacao da nova senha nao confere.");
+      setError(PASSWORD_CONFIRMATION_MISMATCH_MESSAGE);
       return;
     }
 
     if (form.newPassword === form.currentPassword) {
-      setError("A nova senha deve ser diferente da senha atual.");
+      setError(NEW_PASSWORD_MUST_BE_DIFFERENT_MESSAGE);
       return;
     }
 
@@ -103,12 +109,12 @@ export function ChangePasswordForm() {
 
     if (!response.ok) {
       const payload = (await response.json().catch(() => ({}))) as { error?: string };
-      setError(payload.error ?? "Nao foi possivel alterar sua senha.");
+      setError(payload.error ?? PASSWORD_UPDATE_FAILED_MESSAGE);
       return;
     }
 
     setForm(initialState);
-    setSuccess("Senha atualizada com sucesso.");
+    setSuccess(PASSWORD_UPDATE_SUCCESS_MESSAGE);
     setLimitWarning("");
   }
 
@@ -171,9 +177,7 @@ export function ChangePasswordForm() {
         />
       </div>
 
-      <p className="text-xs text-slate-500">
-        Sua senha deve ter entre {PASSWORD_MIN_LENGTH} e {PASSWORD_MAX_LENGTH} caracteres.
-      </p>
+      <p className="text-xs text-slate-500">{PASSWORD_LENGTH_HINT}</p>
 
       {limitWarning && <p className="text-sm text-amber-700">{limitWarning}</p>}
       {error && <p className="text-sm text-red-600">{error}</p>}

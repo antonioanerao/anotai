@@ -4,6 +4,9 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { hashPassword, verifyPassword } from "@/lib/password";
 import {
+  INVALID_DATA_MESSAGE,
+  NEW_PASSWORD_MUST_BE_DIFFERENT_MESSAGE,
+  PASSWORD_CONFIRMATION_MISMATCH_MESSAGE,
   PASSWORD_MAX_LENGTH,
   PASSWORD_MIN_LENGTH
 } from "@/lib/password-policy";
@@ -19,7 +22,7 @@ const changePasswordSchema = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["confirmNewPassword"],
-        message: "A confirmacao da nova senha nao confere."
+        message: PASSWORD_CONFIRMATION_MISMATCH_MESSAGE
       });
     }
 
@@ -27,7 +30,7 @@ const changePasswordSchema = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["newPassword"],
-        message: "A nova senha deve ser diferente da senha atual."
+        message: NEW_PASSWORD_MUST_BE_DIFFERENT_MESSAGE
       });
     }
   });
@@ -43,7 +46,7 @@ export async function PATCH(request: Request) {
   const parsed = changePasswordSchema.safeParse(body);
 
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Dados invalidos." }, { status: 400 });
+    return NextResponse.json({ error: parsed.error.issues[0]?.message ?? INVALID_DATA_MESSAGE }, { status: 400 });
   }
 
   const user = await prisma.user.findUnique({
