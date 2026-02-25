@@ -4,6 +4,8 @@ import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { PASSWORD_MIN_LENGTH } from "@/lib/password-policy";
+import { CAPTCHA_ACTION_LOGIN } from "@/lib/captcha-actions";
+import { getCaptchaToken, isCaptchaRequiredOnClient } from "@/lib/captcha-client";
 
 function getSafeCallbackPath(rawCallbackUrl: string | null): string {
   if (!rawCallbackUrl) return "/";
@@ -24,6 +26,7 @@ function getSafeCallbackPath(rawCallbackUrl: string | null): string {
 }
 
 export function LoginForm() {
+  const captchaRequired = isCaptchaRequiredOnClient();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -36,10 +39,23 @@ export function LoginForm() {
     setError(null);
     setIsLoading(true);
     const callbackPath = getSafeCallbackPath(searchParams.get("callbackUrl"));
+    let captchaToken: string | undefined;
+
+    if (captchaRequired) {
+      try {
+        captchaToken = await getCaptchaToken(CAPTCHA_ACTION_LOGIN);
+      } catch {
+        setError("Nao foi possivel validar o captcha. Tente novamente.");
+        setIsLoading(false);
+        return;
+      }
+    }
 
     const result = await signIn("credentials", {
       email,
       password,
+      captchaToken,
+      captchaAction: CAPTCHA_ACTION_LOGIN,
       redirect: false,
       callbackUrl: callbackPath
     });
@@ -47,7 +63,7 @@ export function LoginForm() {
     setIsLoading(false);
 
     if (!result || result.error) {
-      setError("Credenciais invalidas.");
+      setError("Credenciais invalidas ou captcha nao validado.");
       return;
     }
 

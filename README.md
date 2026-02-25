@@ -38,9 +38,18 @@ Copie `.env.example` para `.env` e ajuste os valores.
 - `AUTH_SECRET`
 - `NEXTAUTH_URL`
 - `PRIMARY_ADMIN_EMAIL`
+- `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` (reCAPTCHA v3, usado no frontend)
+- `RECAPTCHA_SECRET_KEY` (reCAPTCHA v3, usado no backend)
+- `RECAPTCHA_MIN_SCORE` (padrao `0.5`)
+
+Comportamento do captcha:
+- Em `development`, login e cadastro funcionam sem captcha.
+- Em `production`, captcha v3 so e usado quando as chaves `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` e `RECAPTCHA_SECRET_KEY` estiverem configuradas.
+- Se as chaves nao estiverem informadas, login e cadastro seguem sem captcha.
 
 Observacao: no Compose, `DATABASE_URL` eh montada automaticamente a partir dessas variaveis.  
-Voce pode definir `DATABASE_URL` manualmente apenas se quiser sobrescrever esse comportamento.
+Para rodar local com `npm run dev`, use `DATABASE_URL` apontando para `localhost`.
+Se quiser sobrescrever a URL interna do servico `app` no Docker Compose, use `DOCKER_DATABASE_URL`.
 
 ## Rodar localmente (sem Docker)
 

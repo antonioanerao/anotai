@@ -21,6 +21,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_RECAPTCHA_SITE_KEY: ${NEXT_PUBLIC_RECAPTCHA_SITE_KEY:-}
     container_name: ${APP_CONTAINER_NAME:-anotai_app}
     restart: unless-stopped
     depends_on:
@@ -29,10 +31,13 @@ services:
     ports:
       - "${APP_PORT:-3000}:3000"
     environment:
-      DATABASE_URL: ${DATABASE_URL:-postgresql://${POSTGRES_USER:-anotai_user}:${POSTGRES_PASSWORD:-change-me}@${DB_HOST:-db}:5432/${POSTGRES_DB:-anotai}?schema=${DB_SCHEMA:-public}}
+      DATABASE_URL: ${DOCKER_DATABASE_URL:-postgresql://${POSTGRES_USER:-anotai_user}:${POSTGRES_PASSWORD:-change-me}@${DB_HOST:-db}:5432/${POSTGRES_DB:-anotai}?schema=${DB_SCHEMA:-public}}
       AUTH_SECRET: ${AUTH_SECRET}
       NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
       PRIMARY_ADMIN_EMAIL: ${PRIMARY_ADMIN_EMAIL}
+      NEXT_PUBLIC_RECAPTCHA_SITE_KEY: ${NEXT_PUBLIC_RECAPTCHA_SITE_KEY:-}
+      RECAPTCHA_SECRET_KEY: ${RECAPTCHA_SECRET_KEY:-}
+      RECAPTCHA_MIN_SCORE: ${RECAPTCHA_MIN_SCORE:-0.5}
 
 volumes:
   postgres_data_anotai:

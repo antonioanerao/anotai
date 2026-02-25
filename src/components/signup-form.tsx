@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { CAPTCHA_ACTION_SIGNUP } from "@/lib/captcha-actions";
+import { getCaptchaToken, isCaptchaRequiredOnClient } from "@/lib/captcha-client";
 import {
   PASSWORD_CONFIRMATION_MISMATCH_MESSAGE,
   SIGNUP_FAILED_MESSAGE,
@@ -42,6 +44,7 @@ const initialFormState: SignupFormState = {
 };
 
 export function SignupForm() {
+  const captchaRequired = isCaptchaRequiredOnClient();
   const [form, setForm] = useState<SignupFormState>(initialFormState);
   const [error, setError] = useState<string | null>(null);
   const [limitWarning, setLimitWarning] = useState("");
@@ -96,6 +99,17 @@ export function SignupForm() {
       return;
     }
 
+    let captchaToken: string | undefined;
+    if (captchaRequired) {
+      try {
+        captchaToken = await getCaptchaToken(CAPTCHA_ACTION_SIGNUP);
+      } catch {
+        setError("Nao foi possivel validar o captcha. Tente novamente.");
+        setIsLoading(false);
+        return;
+      }
+    }
+
     const response = await fetch("/api/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -103,7 +117,9 @@ export function SignupForm() {
         name: form.name,
         email: form.email,
         password: form.password,
-        confirmPassword: form.confirmPassword
+        confirmPassword: form.confirmPassword,
+        captchaToken,
+        captchaAction: CAPTCHA_ACTION_SIGNUP
       })
     });
 

@@ -4,10 +4,14 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { verifyPassword } from "@/lib/password";
 import { PASSWORD_MIN_LENGTH } from "@/lib/password-policy";
+import { CAPTCHA_ACTION_LOGIN } from "@/lib/captcha-actions";
+import { verifyCaptchaToken } from "@/lib/captcha";
 
 const credentialSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(PASSWORD_MIN_LENGTH)
+  password: z.string().min(PASSWORD_MIN_LENGTH),
+  captchaToken: z.string().optional(),
+  captchaAction: z.string().optional()
 });
 
 function normalizeEmail(email: string): string {
@@ -27,11 +31,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     Credentials({
       credentials: {
         email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" }
+        password: { label: "Password", type: "password" },
+        captchaToken: { label: "CaptchaToken", type: "text" },
+        captchaAction: { label: "CaptchaAction", type: "text" }
       },
       async authorize(rawCredentials) {
         const parsed = credentialSchema.safeParse(rawCredentials);
         if (!parsed.success) return null;
+        const captchaValidation = await verifyCaptchaToken({
+          token: parsed.data.captchaToken,
+          expectedAction: CAPTCHA_ACTION_LOGIN
+        });
+        if (!captchaValidation.ok) return null;
+        if (parsed.data.captchaAction && parsed.data.captchaAction !== CAPTCHA_ACTION_LOGIN) return null;
 
         const email = normalizeEmail(parsed.data.email);
         const user = await prisma.user.findUnique({ where: { email } });

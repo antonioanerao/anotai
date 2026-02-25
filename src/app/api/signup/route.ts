@@ -4,6 +4,8 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { hashPassword } from "@/lib/password";
 import { getPlatformSettings } from "@/lib/settings";
+import { CAPTCHA_ACTION_SIGNUP } from "@/lib/captcha-actions";
+import { verifyCaptchaToken } from "@/lib/captcha";
 import {
   EMAIL_ALREADY_REGISTERED_MESSAGE,
   INVALID_DATA_MESSAGE,
@@ -17,7 +19,9 @@ const signupSchema = z
     name: z.string().trim().max(120).optional(),
     email: z.string().email(),
     password: z.string().min(PASSWORD_MIN_LENGTH).max(PASSWORD_MAX_LENGTH),
-    confirmPassword: z.string().min(PASSWORD_MIN_LENGTH).max(PASSWORD_MAX_LENGTH)
+    confirmPassword: z.string().min(PASSWORD_MIN_LENGTH).max(PASSWORD_MAX_LENGTH),
+    captchaToken: z.string().optional(),
+    captchaAction: z.string().optional()
   })
   .superRefine((data, ctx) => {
     if (data.password !== data.confirmPassword) {
@@ -44,6 +48,19 @@ export async function POST(request: Request) {
 
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.issues[0]?.message ?? INVALID_DATA_MESSAGE }, { status: 400 });
+  }
+  if (parsed.data.captchaAction && parsed.data.captchaAction !== CAPTCHA_ACTION_SIGNUP) {
+    return NextResponse.json({ error: "Falha na validacao do captcha." }, { status: 403 });
+  }
+
+  const captchaValidation = await verifyCaptchaToken({
+    token: parsed.data.captchaToken,
+    expectedAction: CAPTCHA_ACTION_SIGNUP
+  });
+
+  if (!captchaValidation.ok) {
+    const statusCode = captchaValidation.reason === "missing-secret" ? 503 : 403;
+    return NextResponse.json({ error: "Falha na validacao do captcha." }, { status: statusCode });
   }
 
   const session = await auth();
