@@ -1,11 +1,15 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { PASSWORD_MIN_LENGTH } from "@/lib/password-policy";
 import { CAPTCHA_ACTION_LOGIN } from "@/lib/captcha-actions";
-import { getCaptchaToken, isCaptchaRequiredOnClient } from "@/lib/captcha-client";
+import {
+  cleanupCaptchaArtifacts,
+  getCaptchaToken,
+  isCaptchaRequiredOnClient
+} from "@/lib/captcha-client";
 
 function getSafeCallbackPath(rawCallbackUrl: string | null): string {
   if (!rawCallbackUrl) return "/";
@@ -33,6 +37,12 @@ export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  useEffect(() => {
+    return () => {
+      cleanupCaptchaArtifacts();
+    };
+  }, []);
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -67,6 +77,7 @@ export function LoginForm() {
       return;
     }
 
+    cleanupCaptchaArtifacts();
     router.replace(callbackPath);
     router.refresh();
   }

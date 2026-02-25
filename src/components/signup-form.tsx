@@ -1,10 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { CAPTCHA_ACTION_SIGNUP } from "@/lib/captcha-actions";
-import { getCaptchaToken, isCaptchaRequiredOnClient } from "@/lib/captcha-client";
+import { CAPTCHA_ACTION_LOGIN, CAPTCHA_ACTION_SIGNUP } from "@/lib/captcha-actions";
+import {
+  cleanupCaptchaArtifacts,
+  getCaptchaToken,
+  isCaptchaRequiredOnClient
+} from "@/lib/captcha-client";
 import {
   PASSWORD_CONFIRMATION_MISMATCH_MESSAGE,
   SIGNUP_FAILED_MESSAGE,
@@ -50,6 +54,12 @@ export function SignupForm() {
   const [limitWarning, setLimitWarning] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    return () => {
+      cleanupCaptchaArtifacts();
+    };
+  }, []);
 
   function updateField(field: keyof SignupFormState, value: string) {
     const isPasswordField = field === "password" || field === "confirmPassword";
@@ -130,15 +140,41 @@ export function SignupForm() {
       return;
     }
 
-    await signIn("credentials", {
+    let loginCaptchaToken: string | undefined;
+    if (captchaRequired) {
+      try {
+        loginCaptchaToken = await getCaptchaToken(CAPTCHA_ACTION_LOGIN);
+      } catch {
+        setIsLoading(false);
+        setError("Conta criada com sucesso. Faca login manualmente para continuar.");
+        cleanupCaptchaArtifacts();
+        router.push("/login");
+        router.refresh();
+        return;
+      }
+    }
+
+    const loginResult = await signIn("credentials", {
       email: form.email,
       password: form.password,
+      captchaToken: loginCaptchaToken,
+      captchaAction: CAPTCHA_ACTION_LOGIN,
       redirect: false
     });
+
+    if (!loginResult || loginResult.error) {
+      setIsLoading(false);
+      setError("Conta criada com sucesso. Faca login manualmente para continuar.");
+      cleanupCaptchaArtifacts();
+      router.push("/login");
+      router.refresh();
+      return;
+    }
 
     setIsLoading(false);
     setForm(initialFormState);
     setLimitWarning("");
+    cleanupCaptchaArtifacts();
     router.push("/");
     router.refresh();
   }

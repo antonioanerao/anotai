@@ -17,10 +17,6 @@ export function isCaptchaRequiredOnClient(): boolean {
   return process.env.NODE_ENV === "production" && recaptchaSiteKey.length > 0;
 }
 
-export function isCaptchaConfiguredOnClient(): boolean {
-  return recaptchaSiteKey.length > 0;
-}
-
 function loadRecaptchaScript(): Promise<void> {
   if (window.grecaptcha) {
     return Promise.resolve();
@@ -84,4 +80,14 @@ export async function getCaptchaToken(action: string): Promise<string> {
         .catch(() => reject(new Error("captcha-execution-failed")));
     });
   });
+}
+
+export function cleanupCaptchaArtifacts(): void {
+  const script = document.getElementById(RECAPTCHA_SCRIPT_ID);
+  if (script) {
+    script.remove();
+  }
+
+  document.querySelectorAll(".grecaptcha-badge").forEach((element) => element.remove());
+  scriptLoadPromise = null;
 }
