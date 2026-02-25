@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { getPlatformSettings } from "@/lib/settings";
 import { MobileMenu } from "@/components/mobile-menu";
 import { LogoutButton } from "@/components/logout-button";
+import { ThemeToggleButton } from "@/components/theme-toggle-button";
 
 export async function AppHeader() {
   const [session, settings] = await Promise.all([
@@ -21,22 +22,23 @@ export async function AppHeader() {
           AnotAI
         </Link>
 
-        <nav className="hidden items-center gap-2 md:flex">
-          <Link
-            href="/"
-            className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
-          >
-            Home
-          </Link>
+        <div className="flex items-center gap-2">
+          <nav className="hidden items-center gap-2 md:flex">
+            <Link
+              href="/"
+              className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+            >
+              Home
+            </Link>
 
-          {isLogged ? (
-            <>
-              <Link
-                href="/my-pads"
-                className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
-              >
-                Meus blocos
-              </Link>
+            {isLogged ? (
+              <>
+                <Link
+                  href="/my-pads"
+                  className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+                >
+                  Meus blocos
+                </Link>
               <Link
                 href="/account"
                 className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
@@ -53,31 +55,34 @@ export async function AppHeader() {
               )}
               <LogoutButton />
             </>
-          ) : (
-            <>
-              <Link
-                href="/login"
-                className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
-              >
-                Login
-              </Link>
-              {settings.allowPublicSignup && (
+            ) : (
+              <>
                 <Link
-                  href="/signup"
-                  className="rounded-md bg-brand-700 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-brand-900"
+                  href="/login"
+                  className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
                 >
-                  Signup
+                  Login
                 </Link>
-              )}
-            </>
-          )}
-        </nav>
+                {settings.allowPublicSignup && (
+                  <Link
+                    href="/signup"
+                    className="rounded-md bg-brand-700 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-brand-900"
+                  >
+                    Signup
+                  </Link>
+                )}
+              </>
+            )}
+          </nav>
 
-        <MobileMenu
-          isLogged={isLogged}
-          isAdmin={isAdmin}
-          allowPublicSignup={settings.allowPublicSignup}
-        />
+          <ThemeToggleButton />
+
+          <MobileMenu
+            isLogged={isLogged}
+            isAdmin={isAdmin}
+            allowPublicSignup={settings.allowPublicSignup}
+          />
+        </div>
       </div>
     </header>
   );

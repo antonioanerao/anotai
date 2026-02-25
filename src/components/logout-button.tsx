@@ -10,10 +10,10 @@ type LogoutButtonProps = {
 
 function getButtonClassName(variant: "default" | "menu"): string {
   if (variant === "menu") {
-    return "w-full rounded-md px-3 py-2 text-left text-sm font-medium text-slate-700 transition hover:bg-slate-100";
+    return "w-full rounded-md px-3 py-2 text-left text-sm font-medium text-slate-700 transition hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-700";
   }
 
-  return "rounded-md bg-slate-900 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-slate-700";
+  return "rounded-md bg-slate-900 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-slate-700 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-300";
 }
 
 export function LogoutButton({ variant = "default", onAction }: LogoutButtonProps) {

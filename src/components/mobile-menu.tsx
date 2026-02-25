@@ -22,25 +22,25 @@ export function MobileMenu({ isLogged, isAdmin, allowPublicSignup }: MobileMenuP
       <button
         type="button"
         onClick={() => setIsOpen((current) => !current)}
-        className="flex items-center gap-2 rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+        className="flex items-center gap-2 rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100 dark:border-slate-600 dark:text-slate-100 dark:hover:bg-slate-700"
         aria-expanded={isOpen}
         aria-haspopup="menu"
       >
         <span aria-hidden="true" className="flex flex-col gap-1">
-          <span className="block h-0.5 w-4 bg-slate-700" />
-          <span className="block h-0.5 w-4 bg-slate-700" />
-          <span className="block h-0.5 w-4 bg-slate-700" />
+          <span className="block h-0.5 w-4 bg-slate-700 dark:bg-slate-100" />
+          <span className="block h-0.5 w-4 bg-slate-700 dark:bg-slate-100" />
+          <span className="block h-0.5 w-4 bg-slate-700 dark:bg-slate-100" />
         </span>
         Menu
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 z-50 mt-2 w-52 rounded-lg border border-slate-200 bg-white p-2 shadow-lg">
+        <div className="absolute right-0 z-50 mt-2 w-52 rounded-lg border border-slate-200 bg-white p-2 shadow-lg dark:border-slate-700 dark:bg-slate-800">
           <nav className="flex flex-col gap-1">
             <Link
               href="/"
               onClick={closeMenu}
-              className="rounded-md px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+              className="rounded-md px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-700"
             >
               Home
             </Link>
@@ -50,14 +50,14 @@ export function MobileMenu({ isLogged, isAdmin, allowPublicSignup }: MobileMenuP
                 <Link
                   href="/my-pads"
                   onClick={closeMenu}
-                  className="rounded-md px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+                  className="rounded-md px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-700"
                 >
                   Meus blocos
                 </Link>
                 <Link
                   href="/account"
                   onClick={closeMenu}
-                  className="rounded-md px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+                  className="rounded-md px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-700"
                 >
                   Conta
                 </Link>
@@ -65,7 +65,7 @@ export function MobileMenu({ isLogged, isAdmin, allowPublicSignup }: MobileMenuP
                   <Link
                     href="/admin"
                     onClick={closeMenu}
-                    className="rounded-md px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+                    className="rounded-md px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-700"
                   >
                     Admin
                   </Link>
@@ -77,7 +77,7 @@ export function MobileMenu({ isLogged, isAdmin, allowPublicSignup }: MobileMenuP
                 <Link
                   href="/login"
                   onClick={closeMenu}
-                  className="rounded-md px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+                  className="rounded-md px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-700"
                 >
                   Login
                 </Link>
