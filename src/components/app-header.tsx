@@ -30,6 +30,12 @@ export async function AppHeader() {
           {isLogged ? (
             <>
               <Link
+                href="/my-pads"
+                className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+              >
+                Meus blocos
+              </Link>
+              <Link
                 href="/account"
                 className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
               >

@@ -21,7 +21,12 @@ export default async function HomePage() {
 
       {session?.user ? (
         <section className="space-y-3">
-          <h2 className="text-xl font-semibold text-slate-900">Criar novo bloco</h2>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="text-xl font-semibold text-slate-900">Criar novo bloco</h2>
+            <Link href="/my-pads" className="text-sm font-medium text-brand-700 hover:underline">
+              Ver meus blocos
+            </Link>
+          </div>
           <CreatePadForm />
         </section>
       ) : (
