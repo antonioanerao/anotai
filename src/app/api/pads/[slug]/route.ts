@@ -90,3 +90,29 @@ export async function PATCH(request: Request, { params }: Params) {
     updatedAt: updated.updatedAt.toISOString()
   });
 }
+
+export async function DELETE(_: Request, { params }: Params) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Autenticacao obrigatoria." }, { status: 401 });
+  }
+
+  const { slug } = await params;
+  const pad = await prisma.pad.findUnique({
+    where: { slug },
+    select: { id: true, ownerId: true }
+  });
+
+  if (!pad) {
+    return NextResponse.json({ error: "Bloco nao encontrado." }, { status: 404 });
+  }
+
+  if (pad.ownerId !== session.user.id) {
+    return NextResponse.json({ error: "Apenas o dono pode excluir o bloco." }, { status: 403 });
+  }
+
+  await prisma.pad.delete({ where: { id: pad.id } });
+
+  return NextResponse.json({ ok: true });
+}

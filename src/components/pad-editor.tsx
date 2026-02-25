@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import Editor from "react-simple-code-editor";
 import Prism from "prismjs";
 import "prismjs/components/prism-clike";
@@ -72,6 +73,7 @@ export function PadEditor({
   canEdit,
   isOwner
 }: PadEditorProps) {
+  const router = useRouter();
   const [content, setContent] = useState(initialContent);
   const [language, setLanguage] = useState<CodeLanguage>(initialLanguage);
   const [lastSavedContent, setLastSavedContent] = useState(initialContent);
@@ -79,6 +81,9 @@ export function PadEditor({
   const [status, setStatus] = useState("Sincronizado");
   const [copyFeedback, setCopyFeedback] = useState("");
   const [isSavingLanguage, setIsSavingLanguage] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   const dirty = useMemo(() => content !== lastSavedContent, [content, lastSavedContent]);
 
@@ -170,6 +175,27 @@ export function PadEditor({
     setTimeout(() => setCopyFeedback(""), 1200);
   }
 
+  async function deletePad() {
+    setIsDeleting(true);
+    setDeleteError("");
+
+    const response = await fetch(`/api/pads/${slug}`, {
+      method: "DELETE"
+    });
+
+    setIsDeleting(false);
+
+    if (!response.ok) {
+      const payload = (await response.json().catch(() => ({}))) as { error?: string };
+      setDeleteError(payload.error ?? "Falha ao excluir bloco.");
+      return;
+    }
+
+    setIsDeleteModalOpen(false);
+    router.replace("/");
+    router.refresh();
+  }
+
   return (
     <section className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -202,6 +228,19 @@ export function PadEditor({
           >
             {copyFeedback || "Copiar conteudo"}
           </button>
+
+          {isOwner && (
+            <button
+              type="button"
+              onClick={() => {
+                setDeleteError("");
+                setIsDeleteModalOpen(true);
+              }}
+              className="rounded-md border border-red-300 px-3 py-1.5 text-sm font-medium text-red-700 transition hover:bg-red-50"
+            >
+              Excluir bloco
+            </button>
+          )}
         </div>
       </div>
 
@@ -219,6 +258,42 @@ export function PadEditor({
             "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace"
         }}
       />
+
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 px-4">
+          <div className="w-full max-w-md rounded-lg border border-slate-200 bg-white p-5 shadow-lg">
+            <h2 className="text-lg font-semibold text-slate-900">Confirmar exclusao</h2>
+            <p className="mt-2 text-sm text-slate-700">
+              Voce tem certeza que deseja excluir o bloco <span className="font-semibold">/{slug}</span>?
+            </p>
+            <p className="mt-1 text-sm text-slate-700">Essa acao nao pode ser desfeita.</p>
+
+            {deleteError && <p className="mt-3 text-sm text-red-600">{deleteError}</p>}
+
+            <div className="mt-5 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  if (isDeleting) return;
+                  setDeleteError("");
+                  setIsDeleteModalOpen(false);
+                }}
+                className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                disabled={isDeleting}
+                onClick={deletePad}
+                className="rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-red-800 disabled:cursor-not-allowed disabled:bg-red-400"
+              >
+                {isDeleting ? "Excluindo..." : "Confirmar exclusao"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
