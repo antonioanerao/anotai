@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { auth } from "@/auth";
 import { getPlatformSettings } from "@/lib/settings";
+import { MobileMenu } from "@/components/mobile-menu";
 import { LogoutButton } from "@/components/logout-button";
 
 export async function AppHeader() {
@@ -10,6 +11,7 @@ export async function AppHeader() {
   ]);
 
   const isLogged = Boolean(session?.user);
+  const isAdmin = session?.user.role === "ADMIN";
 
   return (
     <header className="border-b border-slate-200 bg-white">
@@ -19,7 +21,7 @@ export async function AppHeader() {
           AnotAI
         </Link>
 
-        <nav className="flex items-center gap-2">
+        <nav className="hidden items-center gap-2 md:flex">
           <Link
             href="/"
             className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
@@ -41,7 +43,7 @@ export async function AppHeader() {
               >
                 Conta
               </Link>
-              {session?.user.role === "ADMIN" && (
+              {isAdmin && (
                 <Link
                   href="/admin"
                   className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
@@ -70,6 +72,12 @@ export async function AppHeader() {
             </>
           )}
         </nav>
+
+        <MobileMenu
+          isLogged={isLogged}
+          isAdmin={isAdmin}
+          allowPublicSignup={settings.allowPublicSignup}
+        />
       </div>
     </header>
   );
