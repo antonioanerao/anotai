@@ -15,7 +15,7 @@
     "@prisma/client": "^6.4.1",
     "argon2": "^0.41.1",
     "next": "15.5.12",
-    "next-auth": "5.0.0-beta.25",
+    "next-auth": "5.0.0-beta.30",
     "nanoid": "^5.1.5",
     "prismjs": "^1.30.0",
     "react": "19.0.0",
