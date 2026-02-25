@@ -2,6 +2,8 @@
 
 Projeto AnotAI: editor compartilhavel de notas/codigo com leitura publica, permissoes de edicao e autenticacao.
 
+> Este projeto foi feito inteiramente com `Codex` da OpenAI.
+
 ## Funcionalidades MVP
 
 - Blocos por URL (`/pads/[slug]`) com leitura publica (sem login)
