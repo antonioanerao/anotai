@@ -69,3 +69,11 @@ body {
 .pad-code-editor textarea {
   width: max-content !important;
 }
+
+.dark .pad-code-editor .token.operator,
+.dark .pad-code-editor .token.entity,
+.dark .pad-code-editor .token.url,
+.dark .pad-code-editor .language-css .token.string,
+.dark .pad-code-editor .style .token.string {
+  background: transparent !important;
+}
