@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { LogoutButton } from "@/components/logout-button";
+import { AccountNavMenu } from "@/components/account-nav-menu";
 
 type MobileMenuProps = {
   isLogged: boolean;
@@ -47,20 +48,7 @@ export function MobileMenu({ isLogged, isAdmin, allowPublicSignup }: MobileMenuP
 
             {isLogged ? (
               <>
-                <Link
-                  href="/my-pads"
-                  onClick={closeMenu}
-                  className="rounded-md px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-700"
-                >
-                  Meus blocos
-                </Link>
-                <Link
-                  href="/account"
-                  onClick={closeMenu}
-                  className="rounded-md px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-700"
-                >
-                  Conta
-                </Link>
+                <AccountNavMenu mobile onNavigate={closeMenu} />
                 {isAdmin && (
                   <Link
                     href="/admin"

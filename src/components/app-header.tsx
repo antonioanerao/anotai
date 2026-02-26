@@ -4,6 +4,7 @@ import { getPlatformSettings } from "@/lib/settings";
 import { MobileMenu } from "@/components/mobile-menu";
 import { LogoutButton } from "@/components/logout-button";
 import { ThemeToggleButton } from "@/components/theme-toggle-button";
+import { AccountNavMenu } from "@/components/account-nav-menu";
 
 export async function AppHeader() {
   const [session, settings] = await Promise.all([
@@ -33,28 +34,17 @@ export async function AppHeader() {
 
             {isLogged ? (
               <>
-                <Link
-                  href="/my-pads"
-                  className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
-                >
-                  Meus blocos
-                </Link>
-              <Link
-                href="/account"
-                className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
-              >
-                Conta
-              </Link>
-              {isAdmin && (
-                <Link
-                  href="/admin"
-                  className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
-                >
-                  Admin
-                </Link>
-              )}
-              <LogoutButton />
-            </>
+                <AccountNavMenu />
+                {isAdmin && (
+                  <Link
+                    href="/admin"
+                    className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+                  >
+                    Admin
+                  </Link>
+                )}
+                <LogoutButton />
+              </>
             ) : (
               <>
                 <Link
