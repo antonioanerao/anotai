@@ -3,11 +3,14 @@ import "./globals.css";
 import "prismjs/themes/prism.css";
 import { AppHeader } from "@/components/app-header";
 import { themeInitScript } from "@/lib/theme";
+import { GoogleAnalytics } from "@/components/google-analytics";
 
 export const metadata: Metadata = {
   title: "AnotAI",
   description: "Compartilhe notas por URL com controle de edicao"
 };
+
+const googleAnalyticsId = process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID?.trim() ?? "";
 
 export default function RootLayout({
   children
@@ -20,6 +23,7 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body>
+        {googleAnalyticsId && <GoogleAnalytics measurementId={googleAnalyticsId} />}
         <AppHeader />
         <main className="mx-auto w-full max-w-5xl px-4 py-8">{children}</main>
       </body>

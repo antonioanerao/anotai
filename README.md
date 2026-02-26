@@ -39,6 +39,7 @@ Copie `.env.example` para `.env` e ajuste os valores.
 - `AUTH_SECRET`
 - `NEXTAUTH_URL`
 - `PRIMARY_ADMIN_EMAIL`
+- `NEXT_PUBLIC_GOOGLE_ANALYTICS_ID` (GA4, opcional)
 - `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` (reCAPTCHA v3, usado no frontend)
 - `RECAPTCHA_SECRET_KEY` (reCAPTCHA v3, usado no backend)
 - `RECAPTCHA_MIN_SCORE` (padrao `0.5`)
