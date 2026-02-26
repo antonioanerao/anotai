@@ -4,10 +4,15 @@ import { useState } from "react";
 
 type Props = {
   initialAllowPublicSignup: boolean;
+  initialAllowedSignupDomains: string;
 };
 
-export function AdminSettingsForm({ initialAllowPublicSignup }: Props) {
+export function AdminSettingsForm({
+  initialAllowPublicSignup,
+  initialAllowedSignupDomains
+}: Props) {
   const [allowPublicSignup, setAllowPublicSignup] = useState(initialAllowPublicSignup);
+  const [allowedSignupDomains, setAllowedSignupDomains] = useState(initialAllowedSignupDomains);
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -19,13 +24,17 @@ export function AdminSettingsForm({ initialAllowPublicSignup }: Props) {
     const response = await fetch("/api/admin/settings", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ allowPublicSignup })
+      body: JSON.stringify({
+        allowPublicSignup,
+        allowedSignupDomains
+      })
     });
+    const payload = (await response.json().catch(() => ({}))) as { error?: string };
 
     setIsLoading(false);
 
     if (!response.ok) {
-      setMessage("Falha ao atualizar configuracao.");
+      setMessage(payload.error ?? "Falha ao atualizar configuracao.");
       return;
     }
 
@@ -42,6 +51,23 @@ export function AdminSettingsForm({ initialAllowPublicSignup }: Props) {
         />
         Permitir cadastro publico
       </label>
+
+      <div className="space-y-1">
+        <label htmlFor="allowedSignupDomains" className="block text-sm font-medium text-slate-700">
+          Dominios permitidos para cadastro
+        </label>
+        <textarea
+          id="allowedSignupDomains"
+          value={allowedSignupDomains}
+          onChange={(event) => setAllowedSignupDomains(event.target.value)}
+          placeholder={"mpac.mp.br\nmpro.mp.br"}
+          rows={4}
+          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none ring-brand-500 transition focus:ring"
+        />
+        <p className="text-xs text-slate-500">
+          Informe um dominio por linha (ou separados por virgula). Deixe vazio para aceitar qualquer dominio.
+        </p>
+      </div>
 
       <button
         type="submit"

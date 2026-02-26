@@ -7,6 +7,10 @@ import { getPlatformSettings } from "@/lib/settings";
 import { CAPTCHA_ACTION_SIGNUP } from "@/lib/captcha-actions";
 import { verifyCaptchaToken } from "@/lib/captcha";
 import {
+  isEmailAllowedByDomainPolicy,
+  parseAllowedSignupDomains
+} from "@/lib/signup-domain-policy";
+import {
   EMAIL_ALREADY_REGISTERED_MESSAGE,
   INVALID_DATA_MESSAGE,
   PASSWORD_CONFIRMATION_MISMATCH_MESSAGE,
@@ -72,6 +76,14 @@ export async function POST(request: Request) {
   }
 
   const email = normalizeEmail(parsed.data.email);
+  const allowedSignupDomains = parseAllowedSignupDomains(settings.allowedSignupDomains).domains;
+  if (!isAdminRequest && !isEmailAllowedByDomainPolicy(email, allowedSignupDomains)) {
+    return NextResponse.json(
+      { error: "Dominio de email nao permitido para cadastro publico." },
+      { status: 403 }
+    );
+  }
+
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
     return NextResponse.json({ error: EMAIL_ALREADY_REGISTERED_MESSAGE }, { status: 409 });

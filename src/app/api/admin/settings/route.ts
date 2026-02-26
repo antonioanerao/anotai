@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
-import { setAllowPublicSignup } from "@/lib/settings";
+import { setSignupPolicy } from "@/lib/settings";
+import { parseAllowedSignupDomains } from "@/lib/signup-domain-policy";
 
 const settingsSchema = z.object({
-  allowPublicSignup: z.boolean()
+  allowPublicSignup: z.boolean(),
+  allowedSignupDomains: z.string().max(4000)
 });
 
 export async function PATCH(request: Request) {
@@ -21,13 +23,25 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "Dados invalidos." }, { status: 400 });
   }
 
-  const settings = await setAllowPublicSignup(
-    parsed.data.allowPublicSignup,
-    session.user.id
-  );
+  const parsedDomains = parseAllowedSignupDomains(parsed.data.allowedSignupDomains);
+  if (parsedDomains.invalidDomains.length > 0) {
+    return NextResponse.json(
+      {
+        error: `Dominio(s) invalido(s): ${parsedDomains.invalidDomains.join(", ")}`
+      },
+      { status: 400 }
+    );
+  }
+
+  const settings = await setSignupPolicy({
+    allowPublicSignup: parsed.data.allowPublicSignup,
+    allowedSignupDomainsRaw: parsed.data.allowedSignupDomains,
+    updatedById: session.user.id
+  });
 
   return NextResponse.json({
     allowPublicSignup: settings.allowPublicSignup,
+    allowedSignupDomains: settings.allowedSignupDomains,
     updatedAt: settings.updatedAt.toISOString()
   });
 }

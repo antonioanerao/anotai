@@ -91,6 +91,7 @@ model Pad {
 model PlatformSettings {
   id                Int      @id @default(1)
   allowPublicSignup Boolean  @default(true)
+  allowedSignupDomains String @default("")
   updatedById       String?
   updatedBy         User?    @relation("settingsUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
   createdAt         DateTime @default(now())

@@ -26,7 +26,10 @@ export default async function AdminPage() {
       <div className="grid gap-6 md:grid-cols-2">
         <div className="space-y-3">
           <h2 className="text-lg font-semibold text-slate-900">Cadastro publico</h2>
-          <AdminSettingsForm initialAllowPublicSignup={settings.allowPublicSignup} />
+          <AdminSettingsForm
+            initialAllowPublicSignup={settings.allowPublicSignup}
+            initialAllowedSignupDomains={settings.allowedSignupDomains}
+          />
         </div>
 
         <div className="space-y-3">

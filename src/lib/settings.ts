@@ -1,4 +1,8 @@
 import { prisma } from "@/lib/prisma";
+import {
+  parseAllowedSignupDomains,
+  serializeAllowedSignupDomains
+} from "@/lib/signup-domain-policy";
 
 export async function getPlatformSettings() {
   const existing = await prisma.platformSettings.findUnique({
@@ -8,7 +12,7 @@ export async function getPlatformSettings() {
 
   try {
     return await prisma.platformSettings.create({
-      data: { id: 1, allowPublicSignup: true }
+      data: { id: 1, allowPublicSignup: true, allowedSignupDomains: "" }
     });
   } catch {
     return prisma.platformSettings.findUniqueOrThrow({
@@ -17,14 +21,23 @@ export async function getPlatformSettings() {
   }
 }
 
-export async function setAllowPublicSignup(
-  allowPublicSignup: boolean,
-  updatedById?: string
+export async function setSignupPolicy(
+  params: {
+    allowPublicSignup: boolean;
+    allowedSignupDomainsRaw: string;
+    updatedById?: string;
+  }
 ) {
   await getPlatformSettings();
+  const parsedDomains = parseAllowedSignupDomains(params.allowedSignupDomainsRaw);
+  const serializedDomains = serializeAllowedSignupDomains(parsedDomains.domains);
 
   return prisma.platformSettings.update({
     where: { id: 1 },
-    data: { allowPublicSignup, updatedById }
+    data: {
+      allowPublicSignup: params.allowPublicSignup,
+      allowedSignupDomains: serializedDomains,
+      updatedById: params.updatedById
+    }
   });
 }
