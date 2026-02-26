@@ -1,0 +1,5 @@
+ALTER TABLE "PlatformSettings"
+ADD COLUMN "requireAuthToCreatePad" BOOLEAN NOT NULL DEFAULT true;
+
+ALTER TABLE "Pad"
+ALTER COLUMN "ownerId" DROP NOT NULL;

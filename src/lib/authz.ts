@@ -6,7 +6,7 @@ export function isAdmin(role: UserRole | undefined): boolean {
 
 export function canEditPad(params: {
   userId?: string;
-  ownerId: string;
+  ownerId?: string | null;
   editMode: EditMode;
 }): boolean {
   if (params.editMode === "ANONYMOUS") return true;

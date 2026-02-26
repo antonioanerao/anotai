@@ -6,7 +6,8 @@ import { parseAllowedSignupDomains } from "@/lib/signup-domain-policy";
 
 const settingsSchema = z.object({
   allowPublicSignup: z.boolean(),
-  allowedSignupDomains: z.string().max(4000)
+  allowedSignupDomains: z.string().max(4000),
+  requireAuthToCreatePad: z.boolean()
 });
 
 export async function PATCH(request: Request) {
@@ -36,12 +37,14 @@ export async function PATCH(request: Request) {
   const settings = await setSignupPolicy({
     allowPublicSignup: parsed.data.allowPublicSignup,
     allowedSignupDomainsRaw: parsed.data.allowedSignupDomains,
+    requireAuthToCreatePad: parsed.data.requireAuthToCreatePad,
     updatedById: session.user.id
   });
 
   return NextResponse.json({
     allowPublicSignup: settings.allowPublicSignup,
     allowedSignupDomains: settings.allowedSignupDomains,
+    requireAuthToCreatePad: settings.requireAuthToCreatePad,
     updatedAt: settings.updatedAt.toISOString()
   });
 }

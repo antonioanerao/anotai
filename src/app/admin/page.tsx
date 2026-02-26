@@ -29,6 +29,7 @@ export default async function AdminPage() {
           <AdminSettingsForm
             initialAllowPublicSignup={settings.allowPublicSignup}
             initialAllowedSignupDomains={settings.allowedSignupDomains}
+            initialRequireAuthToCreatePad={settings.requireAuthToCreatePad}
           />
         </div>
 

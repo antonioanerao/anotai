@@ -12,7 +12,12 @@ export async function getPlatformSettings() {
 
   try {
     return await prisma.platformSettings.create({
-      data: { id: 1, allowPublicSignup: true, allowedSignupDomains: "" }
+      data: {
+        id: 1,
+        allowPublicSignup: true,
+        allowedSignupDomains: "",
+        requireAuthToCreatePad: true
+      }
     });
   } catch {
     return prisma.platformSettings.findUniqueOrThrow({
@@ -25,6 +30,7 @@ export async function setSignupPolicy(
   params: {
     allowPublicSignup: boolean;
     allowedSignupDomainsRaw: string;
+    requireAuthToCreatePad: boolean;
     updatedById?: string;
   }
 ) {
@@ -37,6 +43,7 @@ export async function setSignupPolicy(
     data: {
       allowPublicSignup: params.allowPublicSignup,
       allowedSignupDomains: serializedDomains,
+      requireAuthToCreatePad: params.requireAuthToCreatePad,
       updatedById: params.updatedById
     }
   });

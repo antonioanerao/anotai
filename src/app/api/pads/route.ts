@@ -4,6 +4,7 @@ import { EditMode } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { buildUniqueSlug } from "@/lib/slugs";
+import { getPlatformSettings } from "@/lib/settings";
 
 const createPadSchema = z.object({
   slug: z.string().min(3).max(80).optional(),
@@ -11,9 +12,10 @@ const createPadSchema = z.object({
 });
 
 export async function POST(request: Request) {
-  const session = await auth();
+  const [session, settings] = await Promise.all([auth(), getPlatformSettings()]);
+  const isAuthenticated = Boolean(session?.user?.id);
 
-  if (!session?.user?.id) {
+  if (!isAuthenticated && settings.requireAuthToCreatePad) {
     return NextResponse.json({ error: "Autenticacao obrigatoria." }, { status: 401 });
   }
 
@@ -25,12 +27,13 @@ export async function POST(request: Request) {
   }
 
   const slug = await buildUniqueSlug(parsed.data.slug);
+  const editMode = !isAuthenticated ? EditMode.ANONYMOUS : parsed.data.editMode;
 
   const pad = await prisma.pad.create({
     data: {
       slug,
-      editMode: parsed.data.editMode,
-      ownerId: session.user.id
+      editMode,
+      ownerId: session?.user?.id ?? null
     }
   });
 
