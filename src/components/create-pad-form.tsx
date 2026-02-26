@@ -5,9 +5,13 @@ import { useRouter } from "next/navigation";
 
 type EditMode = "OWNER_ONLY" | "COLLABORATIVE" | "ANONYMOUS";
 
-export function CreatePadForm() {
+type CreatePadFormProps = {
+  anonymousOnly?: boolean;
+};
+
+export function CreatePadForm({ anonymousOnly = false }: CreatePadFormProps) {
   const [slug, setSlug] = useState("");
-  const [editMode, setEditMode] = useState<EditMode>("OWNER_ONLY");
+  const [editMode, setEditMode] = useState<EditMode>(anonymousOnly ? "ANONYMOUS" : "OWNER_ONLY");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -20,7 +24,10 @@ export function CreatePadForm() {
     const response = await fetch("/api/pads", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ slug: slug || undefined, editMode })
+      body: JSON.stringify({
+        slug: slug || undefined,
+        editMode: anonymousOnly ? "ANONYMOUS" : editMode
+      })
     });
 
     setIsLoading(false);
@@ -50,36 +57,46 @@ export function CreatePadForm() {
         />
       </div>
 
-      <fieldset className="space-y-2">
-        <legend className="text-sm font-medium text-slate-700">Permissao de edicao</legend>
-        <label className="flex items-center gap-2 text-sm text-slate-700">
-          <input
-            type="radio"
-            name="editMode"
-            checked={editMode === "OWNER_ONLY"}
-            onChange={() => setEditMode("OWNER_ONLY")}
-          />
-          Apenas o criador pode editar
-        </label>
-        <label className="flex items-center gap-2 text-sm text-slate-700">
-          <input
-            type="radio"
-            name="editMode"
-            checked={editMode === "COLLABORATIVE"}
-            onChange={() => setEditMode("COLLABORATIVE")}
-          />
-          Qualquer usuario logado pode editar
-        </label>
-        <label className="flex items-center gap-2 text-sm text-slate-700">
-          <input
-            type="radio"
-            name="editMode"
-            checked={editMode === "ANONYMOUS"}
-            onChange={() => setEditMode("ANONYMOUS")}
-          />
-          Qualquer pessoa pode editar (mesmo sem login)
-        </label>
-      </fieldset>
+      {anonymousOnly ? (
+        <fieldset className="space-y-2">
+          <legend className="text-sm font-medium text-slate-700">Permissao de edicao</legend>
+          <label className="flex items-center gap-2 text-sm text-slate-700">
+            <input type="radio" name="editMode" checked readOnly />
+            Qualquer pessoa pode editar (mesmo sem login)
+          </label>
+        </fieldset>
+      ) : (
+        <fieldset className="space-y-2">
+          <legend className="text-sm font-medium text-slate-700">Permissao de edicao</legend>
+          <label className="flex items-center gap-2 text-sm text-slate-700">
+            <input
+              type="radio"
+              name="editMode"
+              checked={editMode === "OWNER_ONLY"}
+              onChange={() => setEditMode("OWNER_ONLY")}
+            />
+            Apenas o criador pode editar
+          </label>
+          <label className="flex items-center gap-2 text-sm text-slate-700">
+            <input
+              type="radio"
+              name="editMode"
+              checked={editMode === "COLLABORATIVE"}
+              onChange={() => setEditMode("COLLABORATIVE")}
+            />
+            Qualquer usuario logado pode editar
+          </label>
+          <label className="flex items-center gap-2 text-sm text-slate-700">
+            <input
+              type="radio"
+              name="editMode"
+              checked={editMode === "ANONYMOUS"}
+              onChange={() => setEditMode("ANONYMOUS")}
+            />
+            Qualquer pessoa pode editar (mesmo sem login)
+          </label>
+        </fieldset>
+      )}
 
       {error && <p className="text-sm text-red-600">{error}</p>}
 

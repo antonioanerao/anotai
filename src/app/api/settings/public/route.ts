@@ -8,6 +8,7 @@ export async function GET() {
 
   return NextResponse.json({
     allowPublicSignup: settings.allowPublicSignup,
-    allowedSignupDomains
+    allowedSignupDomains,
+    requireAuthToCreatePad: settings.requireAuthToCreatePad
   });
 }

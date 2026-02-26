@@ -5,14 +5,17 @@ import { useState } from "react";
 type Props = {
   initialAllowPublicSignup: boolean;
   initialAllowedSignupDomains: string;
+  initialRequireAuthToCreatePad: boolean;
 };
 
 export function AdminSettingsForm({
   initialAllowPublicSignup,
-  initialAllowedSignupDomains
+  initialAllowedSignupDomains,
+  initialRequireAuthToCreatePad
 }: Props) {
   const [allowPublicSignup, setAllowPublicSignup] = useState(initialAllowPublicSignup);
   const [allowedSignupDomains, setAllowedSignupDomains] = useState(initialAllowedSignupDomains);
+  const [requireAuthToCreatePad, setRequireAuthToCreatePad] = useState(initialRequireAuthToCreatePad);
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -26,7 +29,8 @@ export function AdminSettingsForm({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         allowPublicSignup,
-        allowedSignupDomains
+        allowedSignupDomains,
+        requireAuthToCreatePad
       })
     });
     const payload = (await response.json().catch(() => ({}))) as { error?: string };
@@ -50,6 +54,15 @@ export function AdminSettingsForm({
           onChange={(event) => setAllowPublicSignup(event.target.checked)}
         />
         Permitir cadastro publico
+      </label>
+
+      <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+        <input
+          type="checkbox"
+          checked={requireAuthToCreatePad}
+          onChange={(event) => setRequireAuthToCreatePad(event.target.checked)}
+        />
+        Exigir login para criar blocos
       </label>
 
       <div className="space-y-1">

@@ -82,8 +82,8 @@ model Pad {
   content   String   @default("")
   editMode  EditMode @default(OWNER_ONLY)
   language  CodeLanguage @default(PLAIN_TEXT)
-  ownerId   String
-  owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId   String?
+  owner     User?    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -92,6 +92,7 @@ model PlatformSettings {
   id                Int      @id @default(1)
   allowPublicSignup Boolean  @default(true)
   allowedSignupDomains String @default("")
+  requireAuthToCreatePad Boolean @default(true)
   updatedById       String?
   updatedBy         User?    @relation("settingsUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
   createdAt         DateTime @default(now())

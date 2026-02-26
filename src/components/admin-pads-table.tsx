@@ -12,7 +12,7 @@ type PadRow = {
   owner: {
     email: string;
     name: string | null;
-  };
+  } | null;
 };
 
 type AdminPadsTableProps = {
@@ -95,7 +95,9 @@ export function AdminPadsTable({ initialPads }: AdminPadsTableProps) {
                     /{pad.slug}
                   </Link>
                 </td>
-                <td className="px-4 py-3 text-sm text-slate-700">{pad.owner.name || pad.owner.email}</td>
+                <td className="px-4 py-3 text-sm text-slate-700">
+                  {pad.owner ? pad.owner.name || pad.owner.email : "Anonimo (sem dono)"}
+                </td>
                 <td className="px-4 py-3 text-sm text-slate-700">{pad.editMode}</td>
                 <td className="px-4 py-3 text-sm text-slate-700">{pad.language}</td>
                 <td className="px-4 py-3 text-sm text-slate-700">{formatDate(pad.updatedAt)}</td>
