@@ -26,6 +26,7 @@ type PadEditorProps = {
   initialUpdatedAt: string;
   canEdit: boolean;
   isOwner: boolean;
+  canChangeLanguage: boolean;
 };
 
 const POLL_MS = 2000;
@@ -71,7 +72,8 @@ export function PadEditor({
   initialLanguage,
   initialUpdatedAt,
   canEdit,
-  isOwner
+  isOwner,
+  canChangeLanguage
 }: PadEditorProps) {
   const router = useRouter();
   const [content, setContent] = useState(initialContent);
@@ -142,7 +144,7 @@ export function PadEditor({
   }, [canEdit, dirty, content, slug]);
 
   async function updateLanguage(nextLanguage: CodeLanguage) {
-    if (!isOwner || nextLanguage === language) return;
+    if (!canChangeLanguage || nextLanguage === language) return;
 
     const previousLanguage = language;
     setLanguage(nextLanguage);
@@ -203,7 +205,7 @@ export function PadEditor({
 
         <div className="flex items-center gap-2">
           <label className="text-sm font-medium text-slate-700">Linguagem:</label>
-          {isOwner ? (
+          {canChangeLanguage ? (
             <select
               value={language}
               onChange={(event) => updateLanguage(event.target.value as CodeLanguage)}

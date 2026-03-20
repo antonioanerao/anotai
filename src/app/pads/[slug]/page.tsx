@@ -26,6 +26,7 @@ export default async function PadPage({ params }: Props) {
     editMode: pad.editMode
   });
   const isOwner = session?.user?.id === pad.ownerId;
+  const canChangeLanguage = pad.ownerId === null || isOwner;
 
   return (
     <div className="space-y-4">
@@ -45,6 +46,7 @@ export default async function PadPage({ params }: Props) {
         initialUpdatedAt={pad.updatedAt.toISOString()}
         canEdit={editable}
         isOwner={isOwner}
+        canChangeLanguage={canChangeLanguage}
       />
     </div>
   );

@@ -56,6 +56,7 @@ export async function PATCH(request: Request, { params }: Params) {
 
   const wantsContentUpdate = typeof parsed.data.content === "string";
   const wantsLanguageUpdate = typeof parsed.data.language === "string";
+  const hasOwner = pad.ownerId !== null;
 
   if (!wantsContentUpdate && !wantsLanguageUpdate) {
     return NextResponse.json({ error: "Nada para atualizar." }, { status: 400 });
@@ -68,11 +69,11 @@ export async function PATCH(request: Request, { params }: Params) {
     return NextResponse.json({ error: "Sem permissao de edicao." }, { status: 403 });
   }
 
-  if (wantsLanguageUpdate && !userId) {
+  if (wantsLanguageUpdate && hasOwner && !userId) {
     return NextResponse.json({ error: "Autenticacao obrigatoria." }, { status: 401 });
   }
 
-  if (wantsLanguageUpdate && !isOwner) {
+  if (wantsLanguageUpdate && hasOwner && !isOwner) {
     return NextResponse.json({ error: "Apenas o dono pode alterar a linguagem." }, { status: 403 });
   }
 
