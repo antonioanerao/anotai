@@ -1,6 +1,6 @@
 # AnotAI
 
-Projeto AnotAI: editor compartilhavel de notas/codigo com leitura publica, permissoes de edicao e autenticacao.
+Um jeito simples de compartilhar código online em treinamentos.
 
 > Este projeto foi feito inteiramente com `Codex` da OpenAI.
 

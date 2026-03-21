@@ -15,7 +15,7 @@ export default async function HomePage() {
   return (
     <div className="space-y-8">
       <section className="p-3 text-center">
-        <h1 className="mx-auto text-xl max-w-2xl text-slate-700">
+        <h1 className="mx-auto text-2xl max-w-2xl text-slate-700">
           Um jeito simples de compartilhar código online em treinamentos
         </h1>
       </section>
@@ -23,7 +23,7 @@ export default async function HomePage() {
       {session?.user ? (
         <section className="space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <h2 className="text-xl font-semibold text-slate-700">Criar novo bloco</h2>
+            <h2 className="text-lg font-semibold text-slate-700">Criar novo bloco</h2>
             <Link href="/my-pads" className="text-sm font-medium text-brand-700 hover:underline">
               Ver meus blocos
             </Link>
@@ -32,7 +32,7 @@ export default async function HomePage() {
         </section>
       ) : !settings.requireAuthToCreatePad ? (
         <section className="space-y-3">
-          <h2 className="text-xl font-semibold text-slate-700">Criar novo bloco</h2>
+          <h2 className="text-lg font-semibold text-slate-700">Criar novo bloco</h2>
           <CreatePadForm anonymousOnly />
         </section>
       ) : (
