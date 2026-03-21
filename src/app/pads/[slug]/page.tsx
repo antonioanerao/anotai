@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { canEditPad } from "@/lib/authz";
-import { PadEditor } from "@/components/pad-editor";
+import { PadEditorClient } from "@/components/pad-editor-client";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -39,7 +39,7 @@ export default async function PadPage({ params }: Props) {
         </p>
       </section>
 
-      <PadEditor
+      <PadEditorClient
         slug={pad.slug}
         initialContent={pad.content}
         initialLanguage={pad.language}

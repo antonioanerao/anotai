@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 type EditMode = "OWNER_ONLY" | "COLLABORATIVE" | "ANONYMOUS";
 
@@ -15,6 +16,7 @@ export function CreatePadForm({ anonymousOnly = false }: CreatePadFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const slugPreview = slug.trim() || "slug-gerado-automaticamente";
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -55,11 +57,34 @@ export function CreatePadForm({ anonymousOnly = false }: CreatePadFormProps) {
           placeholder="ex: sprint-planning"
           className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none ring-brand-500 transition focus:ring"
         />
+        <p className="text-xs text-slate-500">
+          URL prevista: <span className="font-mono">/pads/{slugPreview}</span>
+        </p>
       </div>
 
       {anonymousOnly ? (
         <fieldset className="space-y-2">
-          <legend className="text-sm font-medium text-slate-700">Permissao de edicao</legend>
+          <legend className="text-sm font-medium text-slate-700">Permissão de edição</legend>
+          <label className="flex cursor-not-allowed items-center gap-2 text-sm text-slate-400">
+            <input type="radio" name="editMode" checked={false} disabled readOnly />
+            <span>
+              Apenas o criador pode editar (
+              <Link href="/login" className="font-medium text-brand-700 hover:underline">
+                Acessar conta
+              </Link>
+              )
+            </span>
+          </label>
+          <label className="flex cursor-not-allowed items-center gap-2 text-sm text-slate-400">
+            <input type="radio" name="editMode" checked={false} disabled readOnly />
+            <span>
+              Qualquer usuario logado pode editar (
+              <Link href="/login" className="font-medium text-brand-700 hover:underline">
+                Acessar conta
+              </Link>
+              )
+            </span>
+          </label>
           <label className="flex items-center gap-2 text-sm text-slate-700">
             <input type="radio" name="editMode" checked readOnly />
             Qualquer pessoa pode editar (mesmo sem login)
@@ -67,7 +92,7 @@ export function CreatePadForm({ anonymousOnly = false }: CreatePadFormProps) {
         </fieldset>
       ) : (
         <fieldset className="space-y-2">
-          <legend className="text-sm font-medium text-slate-700">Permissao de edicao</legend>
+          <legend className="text-sm font-medium text-slate-700">Permissão de edição</legend>
           <label className="flex items-center gap-2 text-sm text-slate-700">
             <input
               type="radio"

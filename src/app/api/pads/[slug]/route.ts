@@ -19,7 +19,7 @@ export async function GET(_: Request, { params }: Params) {
   const pad = await prisma.pad.findUnique({ where: { slug } });
 
   if (!pad) {
-    return NextResponse.json({ error: "Bloco nao encontrado." }, { status: 404 });
+    return NextResponse.json({ error: "Bloco não encontrado." }, { status: 404 });
   }
 
   return NextResponse.json({
@@ -37,7 +37,7 @@ export async function PATCH(request: Request, { params }: Params) {
   const pad = await prisma.pad.findUnique({ where: { slug } });
 
   if (!pad) {
-    return NextResponse.json({ error: "Bloco nao encontrado." }, { status: 404 });
+    return NextResponse.json({ error: "Bloco não encontrado." }, { status: 404 });
   }
 
   const isOwner = userId === pad.ownerId;
@@ -51,7 +51,7 @@ export async function PATCH(request: Request, { params }: Params) {
   const parsed = updatePadSchema.safeParse(body);
 
   if (!parsed.success) {
-    return NextResponse.json({ error: "Dados invalidos." }, { status: 400 });
+    return NextResponse.json({ error: "Dados inválidos." }, { status: 400 });
   }
 
   const wantsContentUpdate = typeof parsed.data.content === "string";
@@ -64,13 +64,13 @@ export async function PATCH(request: Request, { params }: Params) {
 
   if (wantsContentUpdate && !editable) {
     if (!userId) {
-      return NextResponse.json({ error: "Autenticacao obrigatoria." }, { status: 401 });
+      return NextResponse.json({ error: "Autenticação obrigatória." }, { status: 401 });
     }
-    return NextResponse.json({ error: "Sem permissao de edicao." }, { status: 403 });
+    return NextResponse.json({ error: "Sem permissão de edição." }, { status: 403 });
   }
 
   if (wantsLanguageUpdate && hasOwner && !userId) {
-    return NextResponse.json({ error: "Autenticacao obrigatoria." }, { status: 401 });
+    return NextResponse.json({ error: "Autenticação obrigatória." }, { status: 401 });
   }
 
   if (wantsLanguageUpdate && hasOwner && !isOwner) {
@@ -96,7 +96,7 @@ export async function DELETE(_: Request, { params }: Params) {
   const session = await auth();
 
   if (!session?.user?.id) {
-    return NextResponse.json({ error: "Autenticacao obrigatoria." }, { status: 401 });
+    return NextResponse.json({ error: "Autenticação obrigatória." }, { status: 401 });
   }
 
   const { slug } = await params;
@@ -106,7 +106,7 @@ export async function DELETE(_: Request, { params }: Params) {
   });
 
   if (!pad) {
-    return NextResponse.json({ error: "Bloco nao encontrado." }, { status: 404 });
+    return NextResponse.json({ error: "Bloco não encontrado." }, { status: 404 });
   }
 
   if (pad.ownerId !== session.user.id) {

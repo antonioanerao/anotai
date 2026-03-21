@@ -19,7 +19,7 @@ type PadPayload = {
   updatedAt: string;
 };
 
-type PadEditorProps = {
+export type PadEditorProps = {
   slug: string;
   initialContent: string;
   initialLanguage: CodeLanguage;
