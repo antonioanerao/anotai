@@ -25,6 +25,14 @@ function GitHubRepoButton() {
   );
 }
 
+function GitHubRepoButtonMobile() {
+  return (
+    <div className="md:hidden">
+      <GitHubRepoButton />
+    </div>
+  );
+}
+
 export async function AppHeader() {
   const [session, settings] = await Promise.all([
     auth(),
@@ -87,6 +95,7 @@ export async function AppHeader() {
           </nav>
 
           <ThemeToggleButton />
+          <GitHubRepoButtonMobile />
 
           <MobileMenu
             isLogged={isLogged}
