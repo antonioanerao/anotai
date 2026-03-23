@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Editor from "react-simple-code-editor";
 import Prism from "prismjs";
@@ -86,8 +86,16 @@ export function PadEditor({
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
+  const [editorScrollTop, setEditorScrollTop] = useState(0);
+  const editorWrapperRef = useRef<HTMLDivElement | null>(null);
 
   const dirty = useMemo(() => content !== lastSavedContent, [content, lastSavedContent]);
+  const totalLines = useMemo(() => Math.max(content.split("\n").length, 1), [content]);
+  const lineNumberDigits = useMemo(() => String(totalLines).length, [totalLines]);
+  const gutterWidth = useMemo(() => `calc(${lineNumberDigits + 2}ch + 8px)`, [lineNumberDigits]);
+  const lineNumbers = useMemo(() => {
+    return Array.from({ length: totalLines }, (_, index) => index + 1).join("\n");
+  }, [totalLines]);
 
   useEffect(() => {
     const poll = setInterval(async () => {
@@ -142,6 +150,20 @@ export function PadEditor({
 
     return () => clearTimeout(timeout);
   }, [canEdit, dirty, content, slug]);
+
+  useEffect(() => {
+    const wrapper = editorWrapperRef.current;
+    if (!wrapper) return;
+
+    const textarea = wrapper.querySelector("textarea");
+    if (!textarea) return;
+
+    const syncScroll = () => setEditorScrollTop(textarea.scrollTop);
+    syncScroll();
+    textarea.addEventListener("scroll", syncScroll, { passive: true });
+
+    return () => textarea.removeEventListener("scroll", syncScroll);
+  }, []);
 
   async function updateLanguage(nextLanguage: CodeLanguage) {
     if (!canChangeLanguage || nextLanguage === language) return;
@@ -246,20 +268,44 @@ export function PadEditor({
         </div>
       </div>
 
-      <Editor
-        value={content}
-        onValueChange={(code) => setContent(code)}
-        highlight={(code) => highlightCode(code, language)}
-        padding={16}
-        readOnly={!canEdit}
-        className="pad-code-editor min-h-[65vh] w-full overflow-auto rounded-lg border border-slate-300 bg-white"
-        textareaClassName="font-mono text-sm leading-6 text-slate-900 outline-none"
-        preClassName="font-mono text-sm leading-6"
-        style={{
-          fontFamily:
-            "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace"
-        }}
-      />
+      <div className="min-h-[65vh] w-full overflow-hidden rounded-lg border border-slate-300 bg-white">
+        <div className="flex min-h-[65vh] w-full">
+          <div
+            aria-hidden="true"
+            className="shrink-0 overflow-hidden border-r border-slate-300 bg-slate-200 text-slate-600 select-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400"
+            style={{ width: gutterWidth }}
+          >
+            <pre
+              className="pointer-events-none select-none font-mono text-sm leading-6 text-right"
+              style={{
+                transform: `translateY(-${editorScrollTop}px)`,
+                paddingTop: "16px",
+                paddingBottom: "16px",
+                paddingRight: "8px"
+              }}
+            >
+              {lineNumbers}
+            </pre>
+          </div>
+
+          <div ref={editorWrapperRef} className="min-w-0 flex-1">
+            <Editor
+              value={content}
+              onValueChange={(code) => setContent(code)}
+              highlight={(code) => highlightCode(code, language)}
+              padding={16}
+              readOnly={!canEdit}
+              className="pad-code-editor min-h-[65vh] w-full overflow-auto bg-transparent"
+              textareaClassName="font-mono text-sm leading-6 text-slate-900 outline-none"
+              preClassName="font-mono text-sm leading-6"
+              style={{
+                fontFamily:
+                  "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace"
+              }}
+            />
+          </div>
+        </div>
+      </div>
 
       {isDeleteModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 px-4">
