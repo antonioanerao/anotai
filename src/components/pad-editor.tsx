@@ -91,6 +91,7 @@ export function PadEditor({
   const [deleteError, setDeleteError] = useState("");
   const [editorScrollTop, setEditorScrollTop] = useState(0);
   const editorWrapperRef = useRef<HTMLDivElement | null>(null);
+  const editorTextareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   const dirty = useMemo(() => content !== lastSavedContent, [content, lastSavedContent]);
   const totalLines = useMemo(() => Math.max(content.split("\n").length, 1), [content]);
@@ -109,19 +110,29 @@ export function PadEditor({
   }, [content.length, longestLineLength]);
   const lineNumberDigits = useMemo(() => String(totalLines).length, [totalLines]);
   const gutterWidth = useMemo(() => `calc(${lineNumberDigits + 2}ch + 8px)`, [lineNumberDigits]);
-  const editorContentWidth = useMemo(() => `calc(${Math.max(longestLineLength + 4, 32)}ch)`, [longestLineLength]);
   const editorStyle = useMemo(
     () =>
       ({
-        "--pad-editor-content-width": editorContentWidth,
         fontFamily:
           "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace"
       }) as CSSProperties,
-    [editorContentWidth]
+    []
   );
   const lineNumbers = useMemo(() => {
     return Array.from({ length: totalLines }, (_, index) => index + 1).join("\n");
   }, [totalLines]);
+
+  function syncEditorElements() {
+    const wrapper = editorWrapperRef.current;
+    if (!wrapper) return null;
+
+    const textarea = wrapper.querySelector("textarea");
+    if (!textarea) return null;
+
+    editorTextareaRef.current = textarea;
+
+    return { textarea };
+  }
 
   useEffect(() => {
     const poll = setInterval(async () => {
@@ -178,65 +189,23 @@ export function PadEditor({
   }, [canEdit, dirty, content, slug]);
 
   useEffect(() => {
-    const wrapper = editorWrapperRef.current;
-    if (!wrapper) return;
+    const elements = syncEditorElements();
+    if (!elements) return;
 
-    const textarea = wrapper.querySelector("textarea");
-    const scrollContainer = wrapper.querySelector<HTMLDivElement>(".pad-code-editor");
-    if (!textarea || !scrollContainer) return;
-
-    const syncWidth = () => {
-      const pre = scrollContainer.querySelector("pre");
-      if (!pre) return;
-
-      const targetWidth = Math.max(pre.scrollWidth, scrollContainer.clientWidth);
-      pre.style.width = `${targetWidth}px`;
-      textarea.style.width = `${targetWidth}px`;
-    };
+    const { textarea } = elements;
 
     const syncFromTextarea = () => {
       setEditorScrollTop(textarea.scrollTop);
-
-      if (scrollContainer.scrollLeft !== textarea.scrollLeft) {
-        scrollContainer.scrollLeft = textarea.scrollLeft;
-      }
-      if (scrollContainer.scrollTop !== textarea.scrollTop) {
-        scrollContainer.scrollTop = textarea.scrollTop;
-      }
     };
 
-    const syncFromContainer = () => {
-      if (textarea.scrollLeft !== scrollContainer.scrollLeft) {
-        textarea.scrollLeft = scrollContainer.scrollLeft;
-      }
-      if (textarea.scrollTop !== scrollContainer.scrollTop) {
-        textarea.scrollTop = scrollContainer.scrollTop;
-        setEditorScrollTop(scrollContainer.scrollTop);
-      }
-    };
-
-    const handleInteraction = () => {
-      syncWidth();
-      syncFromTextarea();
-    };
-
-    syncWidth();
     syncFromTextarea();
-
-    window.addEventListener("resize", syncWidth);
-    scrollContainer.addEventListener("scroll", syncFromContainer, { passive: true });
     textarea.addEventListener("scroll", syncFromTextarea, { passive: true });
-    textarea.addEventListener("keyup", handleInteraction);
-    textarea.addEventListener("input", handleInteraction);
 
     return () => {
-      window.removeEventListener("resize", syncWidth);
-      scrollContainer.removeEventListener("scroll", syncFromContainer);
       textarea.removeEventListener("scroll", syncFromTextarea);
-      textarea.removeEventListener("keyup", handleInteraction);
-      textarea.removeEventListener("input", handleInteraction);
+      editorTextareaRef.current = null;
     };
-  }, [content, language, shouldUsePlainTextHighlight]);
+  }, []);
 
   async function updateLanguage(nextLanguage: CodeLanguage) {
     if (!canChangeLanguage || nextLanguage === language) return;

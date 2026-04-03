@@ -50,25 +50,17 @@ body {
 }
 
 .pad-code-editor {
-  overflow-x: auto !important;
+  overflow-x: hidden !important;
   overflow-y: auto !important;
-  --pad-editor-content-width: 100%;
 }
 
 .pad-code-editor textarea,
 .pad-code-editor pre {
-  white-space: pre !important;
-  overflow-wrap: normal !important;
-  word-break: normal !important;
+  white-space: pre-wrap !important;
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
+  width: 100% !important;
   min-width: 100% !important;
-}
-
-.pad-code-editor pre {
-  width: var(--pad-editor-content-width) !important;
-}
-
-.pad-code-editor textarea {
-  width: var(--pad-editor-content-width) !important;
 }
 
 .dark .pad-code-editor .token.operator,

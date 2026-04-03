@@ -25,7 +25,7 @@ export default function RootLayout({
       <body>
         {googleAnalyticsId && <GoogleAnalytics measurementId={googleAnalyticsId} />}
         <AppHeader />
-        <main className="mx-auto w-full max-w-5xl px-4 py-8">{children}</main>
+        <main className="mx-auto w-full max-w-[76.8rem] px-4 py-8">{children}</main>
       </body>
     </html>
   );
