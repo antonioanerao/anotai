@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useRouter } from "next/navigation";
 import Editor from "react-simple-code-editor";
 import Prism from "prismjs";
@@ -31,6 +31,9 @@ export type PadEditorProps = {
 
 const POLL_MS = 2000;
 const SAVE_DEBOUNCE_MS = 700;
+const HIGHLIGHT_MAX_CONTENT_LENGTH = 100_000;
+const HIGHLIGHT_MAX_LINE_LENGTH = 1_200;
+const HIGHLIGHT_MIN_CONTENT_LENGTH_TO_DEGRADE = 3_000;
 
 const languageOptions: Array<{ value: CodeLanguage; label: string }> = [
   { value: "PLAIN_TEXT", label: "Texto puro" },
@@ -91,8 +94,31 @@ export function PadEditor({
 
   const dirty = useMemo(() => content !== lastSavedContent, [content, lastSavedContent]);
   const totalLines = useMemo(() => Math.max(content.split("\n").length, 1), [content]);
+  const longestLineLength = useMemo(() => {
+    let maxLength = 0;
+    for (const line of content.split("\n")) {
+      if (line.length > maxLength) maxLength = line.length;
+    }
+    return maxLength;
+  }, [content]);
+  const shouldUsePlainTextHighlight = useMemo(() => {
+    return (
+      content.length > HIGHLIGHT_MAX_CONTENT_LENGTH ||
+      (content.length > HIGHLIGHT_MIN_CONTENT_LENGTH_TO_DEGRADE && longestLineLength > HIGHLIGHT_MAX_LINE_LENGTH)
+    );
+  }, [content.length, longestLineLength]);
   const lineNumberDigits = useMemo(() => String(totalLines).length, [totalLines]);
   const gutterWidth = useMemo(() => `calc(${lineNumberDigits + 2}ch + 8px)`, [lineNumberDigits]);
+  const editorContentWidth = useMemo(() => `calc(${Math.max(longestLineLength + 4, 32)}ch)`, [longestLineLength]);
+  const editorStyle = useMemo(
+    () =>
+      ({
+        "--pad-editor-content-width": editorContentWidth,
+        fontFamily:
+          "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace"
+      }) as CSSProperties,
+    [editorContentWidth]
+  );
   const lineNumbers = useMemo(() => {
     return Array.from({ length: totalLines }, (_, index) => index + 1).join("\n");
   }, [totalLines]);
@@ -156,14 +182,61 @@ export function PadEditor({
     if (!wrapper) return;
 
     const textarea = wrapper.querySelector("textarea");
-    if (!textarea) return;
+    const scrollContainer = wrapper.querySelector<HTMLDivElement>(".pad-code-editor");
+    if (!textarea || !scrollContainer) return;
 
-    const syncScroll = () => setEditorScrollTop(textarea.scrollTop);
-    syncScroll();
-    textarea.addEventListener("scroll", syncScroll, { passive: true });
+    const syncWidth = () => {
+      const pre = scrollContainer.querySelector("pre");
+      if (!pre) return;
 
-    return () => textarea.removeEventListener("scroll", syncScroll);
-  }, []);
+      const targetWidth = Math.max(pre.scrollWidth, scrollContainer.clientWidth);
+      pre.style.width = `${targetWidth}px`;
+      textarea.style.width = `${targetWidth}px`;
+    };
+
+    const syncFromTextarea = () => {
+      setEditorScrollTop(textarea.scrollTop);
+
+      if (scrollContainer.scrollLeft !== textarea.scrollLeft) {
+        scrollContainer.scrollLeft = textarea.scrollLeft;
+      }
+      if (scrollContainer.scrollTop !== textarea.scrollTop) {
+        scrollContainer.scrollTop = textarea.scrollTop;
+      }
+    };
+
+    const syncFromContainer = () => {
+      if (textarea.scrollLeft !== scrollContainer.scrollLeft) {
+        textarea.scrollLeft = scrollContainer.scrollLeft;
+      }
+      if (textarea.scrollTop !== scrollContainer.scrollTop) {
+        textarea.scrollTop = scrollContainer.scrollTop;
+        setEditorScrollTop(scrollContainer.scrollTop);
+      }
+    };
+
+    const handleInteraction = () => {
+      syncWidth();
+      syncFromTextarea();
+    };
+
+    syncWidth();
+    syncFromTextarea();
+
+    window.addEventListener("resize", syncWidth);
+    scrollContainer.addEventListener("scroll", syncFromContainer, { passive: true });
+    textarea.addEventListener("scroll", syncFromTextarea, { passive: true });
+    textarea.addEventListener("keyup", handleInteraction);
+    textarea.addEventListener("input", handleInteraction);
+
+    return () => {
+      window.removeEventListener("resize", syncWidth);
+      scrollContainer.removeEventListener("scroll", syncFromContainer);
+      textarea.removeEventListener("scroll", syncFromTextarea);
+      textarea.removeEventListener("keyup", handleInteraction);
+      textarea.removeEventListener("input", handleInteraction);
+    };
+  }, [content, language, shouldUsePlainTextHighlight]);
 
   async function updateLanguage(nextLanguage: CodeLanguage) {
     if (!canChangeLanguage || nextLanguage === language) return;
@@ -292,16 +365,13 @@ export function PadEditor({
             <Editor
               value={content}
               onValueChange={(code) => setContent(code)}
-              highlight={(code) => highlightCode(code, language)}
+              highlight={(code) => highlightCode(code, shouldUsePlainTextHighlight ? "PLAIN_TEXT" : language)}
               padding={16}
               readOnly={!canEdit}
               className="pad-code-editor min-h-[65vh] w-full overflow-auto bg-transparent"
               textareaClassName="font-mono text-sm leading-6 text-slate-900 outline-none"
               preClassName="font-mono text-sm leading-6"
-              style={{
-                fontFamily:
-                  "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace"
-              }}
+              style={editorStyle}
             />
           </div>
         </div>
