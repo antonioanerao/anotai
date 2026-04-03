@@ -8,6 +8,7 @@ type PadRow = {
   slug: string;
   editMode: "OWNER_ONLY" | "COLLABORATIVE" | "ANONYMOUS";
   language: "PLAIN_TEXT" | "PYTHON" | "PHP" | "JAVASCRIPT";
+  viewCount: number;
   updatedAt: string;
   owner: {
     email: string;
@@ -78,6 +79,9 @@ export function AdminPadsTable({ initialPads }: AdminPadsTableProps) {
                 Atualizado em
               </th>
               <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
+                Visualizacoes
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
                 Acoes
               </th>
             </tr>
@@ -101,6 +105,9 @@ export function AdminPadsTable({ initialPads }: AdminPadsTableProps) {
                 <td className="px-4 py-3 text-sm text-slate-700">{pad.editMode}</td>
                 <td className="px-4 py-3 text-sm text-slate-700">{pad.language}</td>
                 <td className="px-4 py-3 text-sm text-slate-700">{formatDate(pad.updatedAt)}</td>
+                <td className="px-4 py-3 text-sm text-slate-700">
+                  {new Intl.NumberFormat("pt-BR").format(pad.viewCount)}
+                </td>
                 <td className="px-4 py-3 text-sm text-slate-700">
                   <button
                     type="button"

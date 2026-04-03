@@ -31,6 +31,7 @@ export default async function MyPadsPage() {
       slug: true,
       editMode: true,
       language: true,
+      viewCount: true,
       createdAt: true,
       updatedAt: true
     }
@@ -64,6 +65,9 @@ export default async function MyPadsPage() {
               <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
                 Atualizado em
               </th>
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
+                Visualizacoes
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
@@ -87,6 +91,9 @@ export default async function MyPadsPage() {
                     dateStyle: "short",
                     timeStyle: "short"
                   }).format(pad.updatedAt)}
+                </td>
+                <td className="px-4 py-3 text-sm text-slate-700">
+                  {new Intl.NumberFormat("pt-BR").format(pad.viewCount)}
                 </td>
               </tr>
             ))}

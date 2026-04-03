@@ -18,6 +18,7 @@ export default async function AdminPadsPage() {
       slug: true,
       editMode: true,
       language: true,
+      viewCount: true,
       createdAt: true,
       updatedAt: true,
       owner: {
