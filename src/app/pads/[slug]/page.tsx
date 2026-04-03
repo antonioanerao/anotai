@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { canEditPad } from "@/lib/authz";
 import { PadEditorClient } from "@/components/pad-editor-client";
+import { PadViewCounter } from "@/components/pad-view-counter";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -31,7 +32,10 @@ export default async function PadPage({ params }: Props) {
   return (
     <div className="space-y-4">
       <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-        <h1 className="text-xl font-semibold text-slate-900">/{pad.slug}</h1>
+        <div className="flex flex-wrap items-baseline gap-2">
+          <h1 className="text-xl font-semibold text-slate-900">/{pad.slug}</h1>
+          <PadViewCounter slug={pad.slug} initialViewCount={pad.viewCount} />
+        </div>
         <p className="mt-1 text-sm text-slate-600">
           {editable
             ? "Voce pode editar este bloco."

@@ -82,6 +82,7 @@ model Pad {
   content   String   @default("")
   editMode  EditMode @default(OWNER_ONLY)
   language  CodeLanguage @default(PLAIN_TEXT)
+  viewCount Int      @default(0)
   ownerId   String?
   owner     User?    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
