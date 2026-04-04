@@ -1,13 +1,59 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { canEditPad } from "@/lib/authz";
 import { PadEditorClient } from "@/components/pad-editor-client";
 import { PadViewCounter } from "@/components/pad-view-counter";
+import { getPlatformSettingsWithFallback } from "@/lib/settings";
 
 type Props = {
   params: Promise<{ slug: string }>;
 };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+
+  const [pad, settings] = await Promise.all([
+    prisma.pad.findUnique({
+      where: { slug },
+      select: {
+        slug: true
+      }
+    }),
+    getPlatformSettingsWithFallback()
+  ]);
+
+  if (!pad) {
+    return {
+      title: "Bloco nao encontrado"
+    };
+  }
+
+  const title = `/${pad.slug}`;
+  const description = `Acesse o bloco /${pad.slug} no ${settings.siteTitle}.`;
+  const padUrl = settings.canonicalUrl ? `${settings.canonicalUrl.replace(/\/$/, "")}/pads/${pad.slug}` : `/pads/${pad.slug}`;
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: padUrl
+    },
+    openGraph: {
+      title,
+      description,
+      url: padUrl,
+      images: settings.ogImagePath ? [settings.ogImagePath] : undefined
+    },
+    twitter: {
+      card: settings.ogImagePath ? "summary_large_image" : "summary",
+      title,
+      description,
+      images: settings.ogImagePath ? [settings.ogImagePath] : undefined
+    }
+  };
+}
 
 export default async function PadPage({ params }: Props) {
   const { slug } = await params;
