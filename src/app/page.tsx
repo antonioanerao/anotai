@@ -1,22 +1,42 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { auth } from "@/auth";
 import { CreatePadForm } from "@/components/create-pad-form";
-import { getPlatformSettings } from "@/lib/settings";
+import { getPlatformSettingsWithFallback } from "@/lib/settings";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getPlatformSettingsWithFallback();
+
+  return {
+    title: settings.homeTitle,
+    description: settings.metaDescription,
+    alternates: {
+      canonical: settings.canonicalUrl || "/"
+    },
+    robots: settings.indexHome ? { index: true, follow: true } : { index: false, follow: false },
+    openGraph: {
+      title: settings.homeTitle,
+      description: settings.metaDescription,
+      url: settings.canonicalUrl || "/",
+      images: settings.ogImagePath ? [settings.ogImagePath] : undefined
+    },
+    twitter: {
+      card: settings.ogImagePath ? "summary_large_image" : "summary",
+      title: settings.homeTitle,
+      description: settings.metaDescription,
+      images: settings.ogImagePath ? [settings.ogImagePath] : undefined
+    }
+  };
+}
 
 export default async function HomePage() {
-  const [session, settings] = await Promise.all([
-    auth(),
-    getPlatformSettings().catch(() => ({
-      allowPublicSignup: true,
-      requireAuthToCreatePad: true
-    }))
-  ]);
+  const [session, settings] = await Promise.all([auth(), getPlatformSettingsWithFallback()]);
 
   return (
     <div className="space-y-8">
       <section className="p-3 text-center">
         <h1 className="mx-auto text-2xl max-w-2xl text-slate-700">
-          Um jeito simples de compartilhar código online em treinamentos
+          {settings.homeTitle}
         </h1>
       </section>
 

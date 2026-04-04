@@ -8,7 +8,7 @@ type Props = {
   initialRequireAuthToCreatePad: boolean;
 };
 
-export function AdminSettingsForm({
+export function AdminSignupSettingsForm({
   initialAllowPublicSignup,
   initialAllowedSignupDomains,
   initialRequireAuthToCreatePad

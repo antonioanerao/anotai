@@ -94,6 +94,12 @@ model PlatformSettings {
   allowPublicSignup Boolean  @default(true)
   allowedSignupDomains String @default("")
   requireAuthToCreatePad Boolean @default(true)
+  siteTitle         String   @default("AnotAI")
+  homeTitle         String   @default("Compartilhamento de codigo para treinamentos")
+  metaDescription   String   @default("Crie e compartilhe blocos de codigo por URL com leitura publica, modos de edicao e colaboracao para aulas, treinamentos e suporte tecnico.")
+  canonicalUrl      String   @default("")
+  ogImagePath       String   @default("")
+  indexHome         Boolean  @default(true)
   updatedById       String?
   updatedBy         User?    @relation("settingsUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
   createdAt         DateTime @default(now())

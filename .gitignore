@@ -31,3 +31,6 @@ prisma/dev.db-journal
 
 # local infra config
 docker-compose.yml
+
+# uploaded assets
+/public/uploads/

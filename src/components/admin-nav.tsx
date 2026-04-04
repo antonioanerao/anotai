@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 type AdminNavProps = {
-  current: "dashboard" | "users" | "pads";
+  current: "dashboard" | "users" | "pads" | "seo";
 };
 
 function navClass(active: boolean): string {
@@ -23,6 +23,9 @@ export function AdminNav({ current }: AdminNavProps) {
       </Link>
       <Link href="/admin/pads" className={navClass(current === "pads")}>
         Blocos
+      </Link>
+      <Link href="/admin/seo" className={navClass(current === "seo")}>
+        SEO
       </Link>
     </nav>
   );

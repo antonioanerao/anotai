@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { getPlatformSettings } from "@/lib/settings";
-import { AdminSettingsForm } from "@/components/admin-settings-form";
+import { AdminSignupSettingsForm } from "@/components/admin-signup-settings-form";
 import { AdminCreateUserForm } from "@/components/admin-create-user-form";
 import { AdminNav } from "@/components/admin-nav";
 
@@ -26,7 +26,7 @@ export default async function AdminPage() {
       <div className="grid gap-6 md:grid-cols-2">
         <div className="space-y-3">
           <h2 className="text-lg font-semibold text-slate-900">Cadastro publico</h2>
-          <AdminSettingsForm
+          <AdminSignupSettingsForm
             initialAllowPublicSignup={settings.allowPublicSignup}
             initialAllowedSignupDomains={settings.allowedSignupDomains}
             initialRequireAuthToCreatePad={settings.requireAuthToCreatePad}
