@@ -290,9 +290,22 @@ export function PadEditor({
           <button
             type="button"
             onClick={copyContent}
-            className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+            aria-label={copyFeedback || "Copiar conteudo"}
+            title={copyFeedback || "Copiar conteudo"}
+            className="rounded-md border border-slate-300 p-2 text-slate-700 transition hover:bg-slate-100"
           >
-            {copyFeedback || "Copiar conteudo"}
+            <svg
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              className="h-5 w-5"
+            >
+              <rect x="9" y="9" width="10" height="10" rx="2" />
+              <path d="M15 9V7a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" />
+            </svg>
           </button>
 
           {isOwner && (
@@ -302,9 +315,25 @@ export function PadEditor({
                 setDeleteError("");
                 setIsDeleteModalOpen(true);
               }}
-              className="rounded-md border border-red-300 px-3 py-1.5 text-sm font-medium text-red-700 transition hover:bg-red-50"
+              aria-label="Excluir bloco"
+              title="Excluir bloco"
+              className="rounded-md border border-red-300 p-2 text-red-700 transition hover:bg-red-50"
             >
-              Excluir bloco
+              <svg
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                className="h-5 w-5"
+              >
+                <path d="M4 7h16" />
+                <path d="M10 11v6" />
+                <path d="M14 11v6" />
+                <path d="M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12" />
+                <path d="M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3" />
+              </svg>
             </button>
           )}
         </div>
