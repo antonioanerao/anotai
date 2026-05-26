@@ -110,13 +110,15 @@ export function PadEditor({
   }, [content.length, longestLineLength]);
   const lineNumberDigits = useMemo(() => String(totalLines).length, [totalLines]);
   const gutterWidth = useMemo(() => `calc(${lineNumberDigits + 2}ch + 8px)`, [lineNumberDigits]);
+  const editorContentWidth = useMemo(() => `max(100%, calc(${longestLineLength + 2}ch + 32px))`, [longestLineLength]);
   const editorStyle = useMemo(
     () =>
       ({
+        "--pad-editor-content-width": editorContentWidth,
         fontFamily:
           "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace"
       }) as CSSProperties,
-    []
+    [editorContentWidth]
   );
   const lineNumbers = useMemo(() => {
     return Array.from({ length: totalLines }, (_, index) => index + 1).join("\n");

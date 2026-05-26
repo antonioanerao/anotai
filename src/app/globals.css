@@ -52,14 +52,16 @@ body {
 .pad-code-editor {
   overflow-x: auto !important;
   overflow-y: auto !important;
+  max-width: 100%;
 }
 
 .pad-code-editor textarea,
 .pad-code-editor pre {
+  width: var(--pad-editor-content-width) !important;
+  min-width: 100% !important;
   white-space: pre !important;
   overflow-wrap: normal !important;
   word-break: normal !important;
-  min-width: max-content !important;
 }
 
 .dark .pad-code-editor .token.operator,
