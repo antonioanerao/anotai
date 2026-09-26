@@ -14,9 +14,9 @@
   "dependencies": {
     "@prisma/client": "^6.4.1",
     "argon2": "^0.41.1",
-    "next": "15.5.15",
-    "next-auth": "5.0.0-beta.30",
-    "nanoid": "^5.1.5",
+    "nanoid": "^5.1.16",
+    "next": "^15.5.26",
+    "next-auth": "^5.0.0-beta.32",
     "prismjs": "^1.30.0",
     "react": "19.0.0",
     "react-dom": "19.0.0",
@@ -31,8 +31,8 @@
     "@types/react-dom": "^19.0.4",
     "autoprefixer": "^10.4.20",
     "eslint": "^9.20.1",
-    "eslint-config-next": "15.2.0",
-    "postcss": "^8.5.10",
+    "eslint-config-next": "^15.5.26",
+    "postcss": "^8.5.28",
     "prisma": "^6.19.3",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.7.3"
