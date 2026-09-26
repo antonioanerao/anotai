@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type Props = {
   initialSiteTitle: string;
@@ -29,18 +29,29 @@ export function AdminSeoSettingsForm({
   const [ogImagePreviewUrl, setOgImagePreviewUrl] = useState(initialOgImagePath);
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const previewObjectUrlRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!ogImageFile) {
-      setOgImagePreviewUrl(ogImagePath);
-      return;
+    return () => {
+      if (previewObjectUrlRef.current) {
+        URL.revokeObjectURL(previewObjectUrlRef.current);
+      }
+    };
+  }, []);
+
+  function onOgImageChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0] ?? null;
+
+    if (previewObjectUrlRef.current) {
+      URL.revokeObjectURL(previewObjectUrlRef.current);
+      previewObjectUrlRef.current = null;
     }
 
-    const objectUrl = URL.createObjectURL(ogImageFile);
-    setOgImagePreviewUrl(objectUrl);
-
-    return () => URL.revokeObjectURL(objectUrl);
-  }, [ogImageFile, ogImagePath]);
+    const previewUrl = file ? URL.createObjectURL(file) : ogImagePath;
+    previewObjectUrlRef.current = file ? previewUrl : null;
+    setOgImageFile(file);
+    setOgImagePreviewUrl(previewUrl);
+  }
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -67,8 +78,13 @@ export function AdminSeoSettingsForm({
       }
 
       nextOgImagePath = uploadPayload.path;
+      if (previewObjectUrlRef.current) {
+        URL.revokeObjectURL(previewObjectUrlRef.current);
+        previewObjectUrlRef.current = null;
+      }
       setOgImagePath(uploadPayload.path);
       setOgImageFile(null);
+      setOgImagePreviewUrl(uploadPayload.path);
     }
 
     const response = await fetch("/api/admin/settings", {
@@ -156,7 +172,7 @@ export function AdminSeoSettingsForm({
           id="ogImage"
           type="file"
           accept="image/png,image/jpeg,image/webp"
-          onChange={(event) => setOgImageFile(event.target.files?.[0] ?? null)}
+          onChange={onOgImageChange}
           className="block w-full text-sm text-slate-700"
         />
         {ogImagePreviewUrl && (

@@ -18,13 +18,17 @@ export function ThemeToggleButton() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem(THEME_STORAGE_KEY);
-    const resolvedTheme: ThemeMode =
-      stored === "dark" || stored === "light" ? stored : resolveThemeFromSystem();
+    const frameId = window.requestAnimationFrame(() => {
+      const stored = localStorage.getItem(THEME_STORAGE_KEY);
+      const resolvedTheme: ThemeMode =
+        stored === "dark" || stored === "light" ? stored : resolveThemeFromSystem();
 
-    applyTheme(resolvedTheme);
-    setTheme(resolvedTheme);
-    setMounted(true);
+      applyTheme(resolvedTheme);
+      setTheme(resolvedTheme);
+      setMounted(true);
+    });
+
+    return () => window.cancelAnimationFrame(frameId);
   }, []);
 
   function toggleTheme() {
