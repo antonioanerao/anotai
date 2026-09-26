@@ -8,7 +8,7 @@ Um jeito simples de compartilhar código online em treinamentos.
 
 - Blocos por URL (`/pads/[slug]`) com leitura publica (sem login)
 - Atualizacao em tempo real via polling
-- Seletor de linguagem do bloco (dono do bloco): Texto puro, Python, PHP e JavaScript
+- Seletor de linguagem do bloco (dono do bloco): Texto puro, Python, PHP, JavaScript, HTML e JSON
 - Highlight de sintaxe no conteudo do bloco
 - Edicao conforme modo de permissao do bloco
 - Modo de permissao por bloco:

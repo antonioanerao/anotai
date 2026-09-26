@@ -6,12 +6,13 @@ import Editor from "react-simple-code-editor";
 import Prism from "prismjs";
 import "prismjs/components/prism-clike";
 import "prismjs/components/prism-javascript";
+import "prismjs/components/prism-json";
 import "prismjs/components/prism-markup";
 import "prismjs/components/prism-markup-templating";
 import "prismjs/components/prism-php";
 import "prismjs/components/prism-python";
 
-type CodeLanguage = "PLAIN_TEXT" | "PYTHON" | "PHP" | "JAVASCRIPT";
+type CodeLanguage = "PLAIN_TEXT" | "PYTHON" | "PHP" | "JAVASCRIPT" | "HTML" | "JSON";
 
 type PadPayload = {
   content: string;
@@ -39,13 +40,17 @@ const languageOptions: Array<{ value: CodeLanguage; label: string }> = [
   { value: "PLAIN_TEXT", label: "Texto puro" },
   { value: "PYTHON", label: "Python" },
   { value: "PHP", label: "PHP" },
-  { value: "JAVASCRIPT", label: "JavaScript" }
+  { value: "JAVASCRIPT", label: "JavaScript" },
+  { value: "HTML", label: "HTML" },
+  { value: "JSON", label: "JSON" }
 ];
 
 const prismLanguageMap: Record<Exclude<CodeLanguage, "PLAIN_TEXT">, string> = {
   PYTHON: "python",
   PHP: "php",
-  JAVASCRIPT: "javascript"
+  JAVASCRIPT: "javascript",
+  HTML: "markup",
+  JSON: "json"
 };
 
 function escapeHtml(code: string) {

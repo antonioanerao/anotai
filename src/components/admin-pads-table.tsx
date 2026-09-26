@@ -7,7 +7,7 @@ type PadRow = {
   id: string;
   slug: string;
   editMode: "OWNER_ONLY" | "COLLABORATIVE" | "ANONYMOUS";
-  language: "PLAIN_TEXT" | "PYTHON" | "PHP" | "JAVASCRIPT";
+  language: "PLAIN_TEXT" | "PYTHON" | "PHP" | "JAVASCRIPT" | "HTML" | "JSON";
   viewCount: number;
   updatedAt: string;
   owner: {

@@ -13,7 +13,9 @@ const languageLabels = {
   PLAIN_TEXT: "Texto puro",
   PYTHON: "Python",
   PHP: "PHP",
-  JAVASCRIPT: "JavaScript"
+  JAVASCRIPT: "JavaScript",
+  HTML: "HTML",
+  JSON: "JSON"
 } as const;
 
 export default async function MyPadsPage() {

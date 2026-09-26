@@ -23,6 +23,8 @@ enum CodeLanguage {
   PYTHON
   PHP
   JAVASCRIPT
+  HTML
+  JSON
 }
 
 model User {

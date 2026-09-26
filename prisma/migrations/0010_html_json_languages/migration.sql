@@ -1,0 +1,3 @@
+-- AlterEnum
+ALTER TYPE "CodeLanguage" ADD VALUE IF NOT EXISTS 'HTML';
+ALTER TYPE "CodeLanguage" ADD VALUE IF NOT EXISTS 'JSON';
