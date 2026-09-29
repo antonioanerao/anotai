@@ -15,7 +15,8 @@ const languageLabels = {
   PHP: "PHP",
   JAVASCRIPT: "JavaScript",
   HTML: "HTML",
-  JSON: "JSON"
+  JSON: "JSON",
+  MARKDOWN: "Markdown"
 } as const;
 
 export default async function MyPadsPage() {

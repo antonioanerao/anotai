@@ -25,6 +25,7 @@ enum CodeLanguage {
   JAVASCRIPT
   HTML
   JSON
+  MARKDOWN
 }
 
 model User {

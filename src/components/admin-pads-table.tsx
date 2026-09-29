@@ -7,7 +7,7 @@ type PadRow = {
   id: string;
   slug: string;
   editMode: "OWNER_ONLY" | "COLLABORATIVE" | "ANONYMOUS";
-  language: "PLAIN_TEXT" | "PYTHON" | "PHP" | "JAVASCRIPT" | "HTML" | "JSON";
+  language: "PLAIN_TEXT" | "PYTHON" | "PHP" | "JAVASCRIPT" | "HTML" | "JSON" | "MARKDOWN";
   viewCount: number;
   updatedAt: string;
   owner: {
@@ -18,6 +18,16 @@ type PadRow = {
 
 type AdminPadsTableProps = {
   initialPads: PadRow[];
+};
+
+const languageLabels: Record<PadRow["language"], string> = {
+  PLAIN_TEXT: "Texto puro",
+  PYTHON: "Python",
+  PHP: "PHP",
+  JAVASCRIPT: "JavaScript",
+  HTML: "HTML",
+  JSON: "JSON",
+  MARKDOWN: "Markdown"
 };
 
 function formatDate(value: string): string {
@@ -103,7 +113,7 @@ export function AdminPadsTable({ initialPads }: AdminPadsTableProps) {
                   {pad.owner ? pad.owner.name || pad.owner.email : "Anonimo (sem dono)"}
                 </td>
                 <td className="px-4 py-3 text-sm text-slate-700">{pad.editMode}</td>
-                <td className="px-4 py-3 text-sm text-slate-700">{pad.language}</td>
+                <td className="px-4 py-3 text-sm text-slate-700">{languageLabels[pad.language]}</td>
                 <td className="px-4 py-3 text-sm text-slate-700">{formatDate(pad.updatedAt)}</td>
                 <td className="px-4 py-3 text-sm text-slate-700">
                   {new Intl.NumberFormat("pt-BR").format(pad.viewCount)}

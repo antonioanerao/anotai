@@ -2,17 +2,21 @@
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import Editor from "react-simple-code-editor";
 import Prism from "prismjs";
 import "prismjs/components/prism-clike";
 import "prismjs/components/prism-javascript";
 import "prismjs/components/prism-json";
 import "prismjs/components/prism-markup";
+import "prismjs/components/prism-markdown";
 import "prismjs/components/prism-markup-templating";
 import "prismjs/components/prism-php";
 import "prismjs/components/prism-python";
 
-type CodeLanguage = "PLAIN_TEXT" | "PYTHON" | "PHP" | "JAVASCRIPT" | "HTML" | "JSON";
+type CodeLanguage = "PLAIN_TEXT" | "PYTHON" | "PHP" | "JAVASCRIPT" | "HTML" | "JSON" | "MARKDOWN";
+
+const MarkdownPreview = dynamic(() => import("@/components/markdown-preview").then((module) => module.MarkdownPreview));
 
 type PadPayload = {
   content: string;
@@ -42,7 +46,8 @@ const languageOptions: Array<{ value: CodeLanguage; label: string }> = [
   { value: "PHP", label: "PHP" },
   { value: "JAVASCRIPT", label: "JavaScript" },
   { value: "HTML", label: "HTML" },
-  { value: "JSON", label: "JSON" }
+  { value: "JSON", label: "JSON" },
+  { value: "MARKDOWN", label: "Markdown" }
 ];
 
 const prismLanguageMap: Record<Exclude<CodeLanguage, "PLAIN_TEXT">, string> = {
@@ -50,7 +55,8 @@ const prismLanguageMap: Record<Exclude<CodeLanguage, "PLAIN_TEXT">, string> = {
   PHP: "php",
   JAVASCRIPT: "javascript",
   HTML: "markup",
-  JSON: "json"
+  JSON: "json",
+  MARKDOWN: "markdown"
 };
 
 function escapeHtml(code: string) {
@@ -91,6 +97,7 @@ export function PadEditor({
   const [status, setStatus] = useState("Sincronizado");
   const [copyFeedback, setCopyFeedback] = useState("");
   const [isSavingLanguage, setIsSavingLanguage] = useState(false);
+  const [showMarkdownPreview, setShowMarkdownPreview] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
@@ -99,6 +106,7 @@ export function PadEditor({
   const editorTextareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   const dirty = useMemo(() => content !== lastSavedContent, [content, lastSavedContent]);
+  const wrapsText = language === "PLAIN_TEXT" || language === "MARKDOWN";
   const totalLines = useMemo(() => Math.max(content.split("\n").length, 1), [content]);
   const longestLineLength = useMemo(() => {
     let maxLength = 0;
@@ -116,8 +124,8 @@ export function PadEditor({
   const lineNumberDigits = useMemo(() => String(totalLines).length, [totalLines]);
   const gutterWidth = useMemo(() => `calc(${lineNumberDigits + 2}ch + 8px)`, [lineNumberDigits]);
   const editorContentWidth = useMemo(
-    () => language === "PLAIN_TEXT" ? "100%" : `max(100%, calc(${longestLineLength + 2}ch + 32px))`,
-    [language, longestLineLength]
+    () => (wrapsText ? "100%" : `max(100%, calc(${longestLineLength + 2}ch + 32px))`),
+    [wrapsText, longestLineLength]
   );
   const editorStyle = useMemo(
     () =>
@@ -278,6 +286,16 @@ export function PadEditor({
         <p className="text-sm text-slate-600">{canEdit ? status : "Modo leitura"}</p>
 
         <div className="flex items-center gap-2">
+          {language === "MARKDOWN" && (
+            <button
+              type="button"
+              onClick={() => setShowMarkdownPreview((current) => !current)}
+              aria-pressed={showMarkdownPreview}
+              className="rounded-md border border-slate-300 px-2.5 py-1.5 text-sm text-slate-700 transition hover:bg-slate-100"
+            >
+              {showMarkdownPreview ? "Ocultar prévia" : "Mostrar prévia"}
+            </button>
+          )}
           <label className="text-sm font-medium text-slate-700">Linguagem:</label>
           {canChangeLanguage ? (
             <select
@@ -350,8 +368,8 @@ export function PadEditor({
       </div>
 
       <div className="min-h-[65vh] w-full overflow-hidden rounded-lg border border-slate-300 bg-white">
-        <div className="flex min-h-[65vh] w-full">
-          {language !== "PLAIN_TEXT" && (
+        <div className={`flex min-h-[65vh] w-full ${language === "MARKDOWN" && showMarkdownPreview ? "flex-col lg:flex-row" : ""}`}>
+          {!wrapsText && (
             <div
               aria-hidden="true"
               className="shrink-0 overflow-hidden border-r border-slate-300 bg-slate-200 text-slate-600 select-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400"
@@ -378,12 +396,22 @@ export function PadEditor({
               highlight={(code) => highlightCode(code, shouldUsePlainTextHighlight ? "PLAIN_TEXT" : language)}
               padding={16}
               readOnly={!canEdit}
-              className={`pad-code-editor min-h-[65vh] w-full overflow-auto bg-transparent${language === "PLAIN_TEXT" ? " pad-plain-text-editor" : ""}`}
+              className={`pad-code-editor min-h-[65vh] w-full overflow-auto bg-transparent${wrapsText ? " pad-wrapped-editor" : ""}`}
               textareaClassName="font-mono text-sm leading-6 text-slate-900 outline-none"
               preClassName="font-mono text-sm leading-6"
               style={editorStyle}
             />
           </div>
+          {language === "MARKDOWN" && showMarkdownPreview && (
+            <div className="min-w-0 flex-1 border-t border-slate-300 lg:border-l lg:border-t-0">
+              <div className="border-b border-slate-200 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700">
+                Prévia
+              </div>
+              <div className="min-w-0 p-4">
+                <MarkdownPreview content={content} />
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
