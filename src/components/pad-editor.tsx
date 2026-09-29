@@ -115,7 +115,10 @@ export function PadEditor({
   }, [content.length, longestLineLength]);
   const lineNumberDigits = useMemo(() => String(totalLines).length, [totalLines]);
   const gutterWidth = useMemo(() => `calc(${lineNumberDigits + 2}ch + 8px)`, [lineNumberDigits]);
-  const editorContentWidth = useMemo(() => `max(100%, calc(${longestLineLength + 2}ch + 32px))`, [longestLineLength]);
+  const editorContentWidth = useMemo(
+    () => language === "PLAIN_TEXT" ? "100%" : `max(100%, calc(${longestLineLength + 2}ch + 32px))`,
+    [language, longestLineLength]
+  );
   const editorStyle = useMemo(
     () =>
       ({
@@ -348,23 +351,25 @@ export function PadEditor({
 
       <div className="min-h-[65vh] w-full overflow-hidden rounded-lg border border-slate-300 bg-white">
         <div className="flex min-h-[65vh] w-full">
-          <div
-            aria-hidden="true"
-            className="shrink-0 overflow-hidden border-r border-slate-300 bg-slate-200 text-slate-600 select-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400"
-            style={{ width: gutterWidth }}
-          >
-            <pre
-              className="pointer-events-none select-none font-mono text-sm leading-6 text-right"
-              style={{
-                transform: `translateY(-${editorScrollTop}px)`,
-                paddingTop: "16px",
-                paddingBottom: "16px",
-                paddingRight: "8px"
-              }}
+          {language !== "PLAIN_TEXT" && (
+            <div
+              aria-hidden="true"
+              className="shrink-0 overflow-hidden border-r border-slate-300 bg-slate-200 text-slate-600 select-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400"
+              style={{ width: gutterWidth }}
             >
-              {lineNumbers}
-            </pre>
-          </div>
+              <pre
+                className="pointer-events-none select-none font-mono text-sm leading-6 text-right"
+                style={{
+                  transform: `translateY(-${editorScrollTop}px)`,
+                  paddingTop: "16px",
+                  paddingBottom: "16px",
+                  paddingRight: "8px"
+                }}
+              >
+                {lineNumbers}
+              </pre>
+            </div>
+          )}
 
           <div ref={editorWrapperRef} className="min-w-0 flex-1">
             <Editor
@@ -373,7 +378,7 @@ export function PadEditor({
               highlight={(code) => highlightCode(code, shouldUsePlainTextHighlight ? "PLAIN_TEXT" : language)}
               padding={16}
               readOnly={!canEdit}
-              className="pad-code-editor min-h-[65vh] w-full overflow-auto bg-transparent"
+              className={`pad-code-editor min-h-[65vh] w-full overflow-auto bg-transparent${language === "PLAIN_TEXT" ? " pad-plain-text-editor" : ""}`}
               textareaClassName="font-mono text-sm leading-6 text-slate-900 outline-none"
               preClassName="font-mono text-sm leading-6"
               style={editorStyle}
