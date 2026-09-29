@@ -78,7 +78,7 @@ export default async function PadPage({ params, searchParams }: Props) {
   const canChangeLanguage = pad.ownerId === null || isOwner;
 
   return (
-    <div className="space-y-4">
+    <div className="pad-page-wide space-y-4">
       <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
         <div className="flex flex-wrap items-baseline gap-2">
           <h1 className="text-xl font-semibold text-slate-900">/{pad.slug}</h1>
