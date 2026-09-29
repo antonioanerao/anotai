@@ -64,6 +64,13 @@ body {
   word-break: normal !important;
 }
 
+.pad-plain-text-editor textarea,
+.pad-plain-text-editor pre {
+  width: 100% !important;
+  white-space: pre-wrap !important;
+  overflow-wrap: break-word !important;
+}
+
 .dark .pad-code-editor .token.operator,
 .dark .pad-code-editor .token.entity,
 .dark .pad-code-editor .token.url,
