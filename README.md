@@ -10,6 +10,7 @@ Um jeito simples de compartilhar código online em treinamentos.
 - Atualizacao em tempo real via polling
 - Seletor de linguagem do bloco (dono do bloco): Texto puro, Python, PHP, JavaScript, HTML, JSON e Markdown
 - Previa opcional lado a lado para blocos Markdown
+- Link de leitura para blocos Markdown (`/pads/[slug]?view=markdown`), sem exibir o codigo-fonte
 - Highlight de sintaxe no conteudo do bloco
 - Edicao conforme modo de permissao do bloco
 - Modo de permissao por bloco:

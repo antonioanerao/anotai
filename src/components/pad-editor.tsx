@@ -28,6 +28,7 @@ export type PadEditorProps = {
   slug: string;
   initialContent: string;
   initialLanguage: CodeLanguage;
+  initialMarkdownOnly: boolean;
   initialUpdatedAt: string;
   canEdit: boolean;
   isOwner: boolean;
@@ -84,6 +85,7 @@ export function PadEditor({
   slug,
   initialContent,
   initialLanguage,
+  initialMarkdownOnly,
   initialUpdatedAt,
   canEdit,
   isOwner,
@@ -92,6 +94,8 @@ export function PadEditor({
   const router = useRouter();
   const [content, setContent] = useState(initialContent);
   const [language, setLanguage] = useState<CodeLanguage>(initialLanguage);
+  const [showMarkdownOnly, setShowMarkdownOnly] = useState(initialMarkdownOnly);
+  const [linkFeedback, setLinkFeedback] = useState("");
   const [lastSavedContent, setLastSavedContent] = useState(initialContent);
   const [lastUpdatedAt, setLastUpdatedAt] = useState(initialUpdatedAt);
   const [status, setStatus] = useState("Sincronizado");
@@ -179,6 +183,15 @@ export function PadEditor({
   }, [slug, lastUpdatedAt, dirty, isSavingLanguage]);
 
   useEffect(() => {
+    const syncViewFromUrl = () => {
+      setShowMarkdownOnly(new URLSearchParams(window.location.search).get("view") === "markdown");
+    };
+
+    window.addEventListener("popstate", syncViewFromUrl);
+    return () => window.removeEventListener("popstate", syncViewFromUrl);
+  }, []);
+
+  useEffect(() => {
     if (!canEdit) return;
     if (!dirty) return;
 
@@ -259,6 +272,26 @@ export function PadEditor({
     setTimeout(() => setCopyFeedback(""), 1200);
   }
 
+  function toggleMarkdownOnly() {
+    const url = new URL(window.location.href);
+    const nextValue = !showMarkdownOnly;
+
+    if (nextValue) {
+      url.searchParams.set("view", "markdown");
+    } else {
+      url.searchParams.delete("view");
+    }
+
+    window.history.pushState(null, "", `${url.pathname}${url.search}${url.hash}`);
+    setShowMarkdownOnly(nextValue);
+  }
+
+  async function copyReaderLink() {
+    await navigator.clipboard.writeText(window.location.href);
+    setLinkFeedback("Link copiado");
+    setTimeout(() => setLinkFeedback(""), 1200);
+  }
+
   async function deletePad() {
     setIsDeleting(true);
     setDeleteError("");
@@ -280,6 +313,35 @@ export function PadEditor({
     router.refresh();
   }
 
+  if (language === "MARKDOWN" && showMarkdownOnly) {
+    return (
+      <section className="space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm text-slate-600">{canEdit ? status : "Modo leitura"}</p>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={copyReaderLink}
+              className="rounded-md border border-slate-300 px-2.5 py-1.5 text-sm text-slate-700 transition hover:bg-slate-100"
+            >
+              {linkFeedback || "Copiar link"}
+            </button>
+            <button
+              type="button"
+              onClick={toggleMarkdownOnly}
+              className="rounded-md border border-slate-300 px-2.5 py-1.5 text-sm text-slate-700 transition hover:bg-slate-100"
+            >
+              Mostrar código Markdown
+            </button>
+          </div>
+        </div>
+        <div className="min-h-[65vh] rounded-lg border border-slate-300 bg-white p-4">
+          <MarkdownPreview content={content} />
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -287,14 +349,23 @@ export function PadEditor({
 
         <div className="flex items-center gap-2">
           {language === "MARKDOWN" && (
-            <button
-              type="button"
-              onClick={() => setShowMarkdownPreview((current) => !current)}
-              aria-pressed={showMarkdownPreview}
-              className="rounded-md border border-slate-300 px-2.5 py-1.5 text-sm text-slate-700 transition hover:bg-slate-100"
-            >
-              {showMarkdownPreview ? "Ocultar prévia" : "Mostrar prévia"}
-            </button>
+            <>
+              <button
+                type="button"
+                onClick={() => setShowMarkdownPreview((current) => !current)}
+                aria-pressed={showMarkdownPreview}
+                className="rounded-md border border-slate-300 px-2.5 py-1.5 text-sm text-slate-700 transition hover:bg-slate-100"
+              >
+                {showMarkdownPreview ? "Ocultar prévia" : "Mostrar prévia"}
+              </button>
+              <button
+                type="button"
+                onClick={toggleMarkdownOnly}
+                className="rounded-md border border-slate-300 px-2.5 py-1.5 text-sm text-slate-700 transition hover:bg-slate-100"
+              >
+                Exibir apenas Markdown
+              </button>
+            </>
           )}
           <label className="text-sm font-medium text-slate-700">Linguagem:</label>
           {canChangeLanguage ? (

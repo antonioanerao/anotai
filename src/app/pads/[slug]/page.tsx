@@ -9,6 +9,7 @@ import { getPlatformSettingsWithFallback } from "@/lib/settings";
 
 type Props = {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ view?: string | string[] }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -55,12 +56,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function PadPage({ params }: Props) {
+export default async function PadPage({ params, searchParams }: Props) {
   const { slug } = await params;
 
-  const [session, pad] = await Promise.all([
+  const [session, pad, query] = await Promise.all([
     auth(),
-    prisma.pad.findUnique({ where: { slug } })
+    prisma.pad.findUnique({ where: { slug } }),
+    searchParams
   ]);
 
   if (!pad) {
@@ -93,6 +95,7 @@ export default async function PadPage({ params }: Props) {
         slug={pad.slug}
         initialContent={pad.content}
         initialLanguage={pad.language}
+        initialMarkdownOnly={pad.language === "MARKDOWN" && query.view === "markdown"}
         initialUpdatedAt={pad.updatedAt.toISOString()}
         canEdit={editable}
         isOwner={isOwner}
