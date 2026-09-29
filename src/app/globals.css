@@ -170,6 +170,10 @@ body {
 .markdown-preview pre code {
   background: transparent;
   padding: 0;
+  color: inherit;
+  text-shadow: none;
+  white-space: inherit;
+  overflow-wrap: inherit;
 }
 
 .markdown-preview hr {
@@ -219,6 +223,62 @@ body {
 .dark .markdown-preview pre,
 .dark .markdown-preview th {
   background: rgb(30 41 59);
+}
+
+.dark .markdown-preview .token.comment,
+.dark .markdown-preview .token.prolog,
+.dark .markdown-preview .token.doctype,
+.dark .markdown-preview .token.cdata {
+  color: rgb(148 163 184);
+}
+
+.dark .markdown-preview .token.punctuation {
+  color: rgb(203 213 225);
+}
+
+.dark .markdown-preview .token.property,
+.dark .markdown-preview .token.tag,
+.dark .markdown-preview .token.boolean,
+.dark .markdown-preview .token.number,
+.dark .markdown-preview .token.constant,
+.dark .markdown-preview .token.symbol,
+.dark .markdown-preview .token.deleted {
+  color: rgb(244 114 182);
+}
+
+.dark .markdown-preview .token.selector,
+.dark .markdown-preview .token.attr-name,
+.dark .markdown-preview .token.string,
+.dark .markdown-preview .token.char,
+.dark .markdown-preview .token.builtin,
+.dark .markdown-preview .token.inserted {
+  color: rgb(134 239 172);
+}
+
+.dark .markdown-preview .token.operator,
+.dark .markdown-preview .token.entity,
+.dark .markdown-preview .token.url,
+.dark .markdown-preview .language-css .token.string,
+.dark .markdown-preview .style .token.string {
+  color: rgb(251 191 36);
+  background: transparent;
+}
+
+.dark .markdown-preview .token.atrule,
+.dark .markdown-preview .token.attr-value,
+.dark .markdown-preview .token.keyword {
+  color: rgb(125 211 252);
+}
+
+.dark .markdown-preview .token.function,
+.dark .markdown-preview .token.class-name {
+  color: rgb(253 164 175);
+}
+
+.dark .markdown-preview .token.regex,
+.dark .markdown-preview .token.important,
+.dark .markdown-preview .token.variable {
+  color: rgb(250 204 21);
 }
 
 .dark .pad-code-editor .token.operator,
