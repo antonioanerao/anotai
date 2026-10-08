@@ -29,6 +29,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   try {
     const pads = await prisma.pad.findMany({
+      where: { isPrivate: false },
       select: {
         slug: true,
         updatedAt: true

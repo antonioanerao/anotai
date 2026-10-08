@@ -6,7 +6,8 @@ Um jeito simples de compartilhar código online em treinamentos.
 
 ## Funcionalidades MVP
 
-- Blocos por URL (`/pads/[slug]`) com leitura publica (sem login)
+- Blocos por URL (`/pads/[slug]`) com leitura pública por padrão (sem login)
+- O dono pode tornar um bloco privado após criá-lo; nesse caso, só ele pode abrir e editar o bloco estando logado
 - Atualizacao em tempo real via polling
 - Seletor de linguagem do bloco (dono do bloco): Texto puro, Python, PHP, JavaScript, HTML, JSON e Markdown
 - Previa opcional lado a lado para blocos Markdown

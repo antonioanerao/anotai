@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { auth } from "@/auth";
+import { canReadPad } from "@/lib/authz";
 
 type Params = {
   params: Promise<{ slug: string }>;
@@ -12,13 +14,14 @@ function buildViewCookieName(slug: string) {
 }
 
 export async function POST(request: Request, { params }: Params) {
+  const session = await auth();
   const { slug } = await params;
   const pad = await prisma.pad.findUnique({
     where: { slug },
-    select: { id: true, viewCount: true }
+    select: { id: true, viewCount: true, ownerId: true, isPrivate: true }
   });
 
-  if (!pad) {
+  if (!pad || !canReadPad({ userId: session?.user?.id, ownerId: pad.ownerId, isPrivate: pad.isPrivate })) {
     return NextResponse.json({ error: "Bloco não encontrado." }, { status: 404 });
   }
 
@@ -43,13 +46,24 @@ export async function POST(request: Request, { params }: Params) {
     return NextResponse.json({ viewCount: pad.viewCount, incremented: false });
   }
 
-  const updatedPad = await prisma.pad.update({
-    where: { id: pad.id },
+  const update = await prisma.pad.updateMany({
+    where: {
+      id: pad.id,
+      OR: [{ isPrivate: false }, { ownerId: session?.user?.id ?? "" }]
+    },
     data: {
       viewCount: {
         increment: 1
       }
-    },
+    }
+  });
+
+  if (update.count === 0) {
+    return NextResponse.json({ error: "Bloco não encontrado." }, { status: 404 });
+  }
+
+  const updatedPad = await prisma.pad.findUniqueOrThrow({
+    where: { id: pad.id },
     select: { viewCount: true }
   });
 

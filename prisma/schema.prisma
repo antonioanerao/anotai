@@ -84,6 +84,7 @@ model Pad {
   slug      String   @unique
   content   String   @default("")
   editMode  EditMode @default(OWNER_ONLY)
+  isPrivate Boolean  @default(false)
   language  CodeLanguage @default(PLAIN_TEXT)
   viewCount Int      @default(0)
   ownerId   String?

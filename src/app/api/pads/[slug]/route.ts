@@ -3,7 +3,7 @@ import { z } from "zod";
 import { CodeLanguage } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { canEditPad } from "@/lib/authz";
+import { canEditPad, canReadPad } from "@/lib/authz";
 
 type Params = {
   params: Promise<{ slug: string }>;
@@ -11,14 +11,16 @@ type Params = {
 
 const updatePadSchema = z.object({
   content: z.string().max(100000).optional(),
-  language: z.nativeEnum(CodeLanguage).optional()
+  language: z.nativeEnum(CodeLanguage).optional(),
+  isPrivate: z.boolean().optional()
 });
 
 export async function GET(_: Request, { params }: Params) {
+  const session = await auth();
   const { slug } = await params;
   const pad = await prisma.pad.findUnique({ where: { slug } });
 
-  if (!pad) {
+  if (!pad || !canReadPad({ userId: session?.user?.id, ownerId: pad.ownerId, isPrivate: pad.isPrivate })) {
     return NextResponse.json({ error: "Bloco não encontrado." }, { status: 404 });
   }
 
@@ -36,7 +38,7 @@ export async function PATCH(request: Request, { params }: Params) {
   const { slug } = await params;
   const pad = await prisma.pad.findUnique({ where: { slug } });
 
-  if (!pad) {
+  if (!pad || !canReadPad({ userId, ownerId: pad.ownerId, isPrivate: pad.isPrivate })) {
     return NextResponse.json({ error: "Bloco não encontrado." }, { status: 404 });
   }
 
@@ -44,7 +46,8 @@ export async function PATCH(request: Request, { params }: Params) {
   const editable = canEditPad({
     userId,
     ownerId: pad.ownerId,
-    editMode: pad.editMode
+    editMode: pad.editMode,
+    isPrivate: pad.isPrivate
   });
 
   const body = (await request.json().catch(() => null)) as unknown;
@@ -56,9 +59,10 @@ export async function PATCH(request: Request, { params }: Params) {
 
   const wantsContentUpdate = typeof parsed.data.content === "string";
   const wantsLanguageUpdate = typeof parsed.data.language === "string";
+  const wantsPrivacyUpdate = typeof parsed.data.isPrivate === "boolean";
   const hasOwner = pad.ownerId !== null;
 
-  if (!wantsContentUpdate && !wantsLanguageUpdate) {
+  if (!wantsContentUpdate && !wantsLanguageUpdate && !wantsPrivacyUpdate) {
     return NextResponse.json({ error: "Nada para atualizar." }, { status: 400 });
   }
 
@@ -77,17 +81,40 @@ export async function PATCH(request: Request, { params }: Params) {
     return NextResponse.json({ error: "Apenas o dono pode alterar a linguagem." }, { status: 403 });
   }
 
-  const updated = await prisma.pad.update({
-    where: { slug },
+  if (wantsPrivacyUpdate && !isOwner) {
+    return NextResponse.json({ error: "Apenas o dono pode alterar a privacidade." }, { status: 403 });
+  }
+
+  const update = await prisma.pad.updateMany({
+    where: {
+      id: pad.id,
+      ...(isOwner ? { ownerId: userId } : { isPrivate: false })
+    },
     data: {
       ...(wantsContentUpdate ? { content: parsed.data.content } : {}),
-      ...(wantsLanguageUpdate ? { language: parsed.data.language } : {})
+      ...(wantsLanguageUpdate ? { language: parsed.data.language } : {}),
+      ...(wantsPrivacyUpdate
+        ? {
+            isPrivate: parsed.data.isPrivate
+          }
+        : {})
     }
   });
+
+  if (update.count === 0) {
+    return NextResponse.json({ error: "Bloco não encontrado." }, { status: 404 });
+  }
+
+  const updated = await prisma.pad.findUniqueOrThrow({ where: { id: pad.id } });
+
+  if (!canReadPad({ userId, ownerId: updated.ownerId, isPrivate: updated.isPrivate })) {
+    return NextResponse.json({ error: "Bloco não encontrado." }, { status: 404 });
+  }
 
   return NextResponse.json({
     content: updated.content,
     language: updated.language,
+    isPrivate: updated.isPrivate,
     updatedAt: updated.updatedAt.toISOString()
   });
 }

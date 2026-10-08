@@ -159,6 +159,10 @@ export function PadEditor({
   useEffect(() => {
     const poll = setInterval(async () => {
       const response = await fetch(`/api/pads/${slug}`, { cache: "no-store" });
+      if (response.status === 404) {
+        router.refresh();
+        return;
+      }
       if (!response.ok) return;
 
       const payload = (await response.json()) as PadPayload;
@@ -180,7 +184,7 @@ export function PadEditor({
     }, POLL_MS);
 
     return () => clearInterval(poll);
-  }, [slug, lastUpdatedAt, dirty, isSavingLanguage]);
+  }, [slug, lastUpdatedAt, dirty, isSavingLanguage, router]);
 
   useEffect(() => {
     const syncViewFromUrl = () => {

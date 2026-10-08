@@ -12,6 +12,7 @@ export default async function AdminPadsPage() {
   }
 
   const pads = await prisma.pad.findMany({
+    where: { OR: [{ isPrivate: false }, { ownerId: session.user.id }] },
     orderBy: { createdAt: "desc" },
     select: {
       id: true,

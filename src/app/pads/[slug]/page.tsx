@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { canEditPad } from "@/lib/authz";
+import { canEditPad, canReadPad } from "@/lib/authz";
 import { PadEditorClient } from "@/components/pad-editor-client";
 import { PadViewCounter } from "@/components/pad-view-counter";
+import { PadPrivacyToggle } from "@/components/pad-privacy-toggle";
 import { getPlatformSettingsWithFallback } from "@/lib/settings";
 
 type Props = {
@@ -19,15 +20,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     prisma.pad.findUnique({
       where: { slug },
       select: {
-        slug: true
+        slug: true,
+        isPrivate: true
       }
     }),
     getPlatformSettingsWithFallback()
   ]);
 
-  if (!pad) {
+  if (!pad || pad.isPrivate) {
     return {
-      title: "Bloco nao encontrado"
+      title: "Bloco privado",
+      robots: { index: false, follow: false }
     };
   }
 
@@ -69,10 +72,19 @@ export default async function PadPage({ params, searchParams }: Props) {
     notFound();
   }
 
+  if (pad.isPrivate && !session?.user?.id) {
+    redirect(`/login?callbackUrl=${encodeURIComponent(`/pads/${slug}`)}`);
+  }
+
+  if (!canReadPad({ userId: session?.user?.id, ownerId: pad.ownerId, isPrivate: pad.isPrivate })) {
+    notFound();
+  }
+
   const editable = canEditPad({
     userId: session?.user?.id,
     ownerId: pad.ownerId,
-    editMode: pad.editMode
+    editMode: pad.editMode,
+    isPrivate: pad.isPrivate
   });
   const isOwner = session?.user?.id === pad.ownerId;
   const canChangeLanguage = pad.ownerId === null || isOwner;
@@ -89,6 +101,9 @@ export default async function PadPage({ params, searchParams }: Props) {
             ? "Voce pode editar este bloco."
             : "Modo leitura. Para editar, entre com uma conta autorizada."}
         </p>
+        {isOwner && (
+          <PadPrivacyToggle slug={pad.slug} initialIsPrivate={pad.isPrivate} />
+        )}
       </section>
 
       <PadEditorClient
