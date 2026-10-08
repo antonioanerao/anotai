@@ -33,6 +33,7 @@ export default async function MyPadsPage() {
       id: true,
       slug: true,
       editMode: true,
+      isPrivate: true,
       language: true,
       viewCount: true,
       createdAt: true,
@@ -55,6 +56,9 @@ export default async function MyPadsPage() {
             <tr>
               <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
                 Bloco
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
+                Acesso
               </th>
               <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
                 Edicao
@@ -81,6 +85,7 @@ export default async function MyPadsPage() {
                     /{pad.slug}
                   </Link>
                 </td>
+                <td className="px-4 py-3 text-sm text-slate-700">{pad.isPrivate ? "Privado" : "Público"}</td>
                 <td className="px-4 py-3 text-sm text-slate-700">{editModeLabels[pad.editMode]}</td>
                 <td className="px-4 py-3 text-sm text-slate-700">{languageLabels[pad.language]}</td>
                 <td className="px-4 py-3 text-sm text-slate-700">

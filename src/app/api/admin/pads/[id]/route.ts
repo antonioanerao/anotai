@@ -17,14 +17,27 @@ export async function DELETE(_: Request, { params }: Params) {
 
   const existing = await prisma.pad.findUnique({
     where: { id },
-    select: { id: true }
+    select: { id: true, ownerId: true, isPrivate: true }
   });
 
   if (!existing) {
     return NextResponse.json({ error: "Bloco nao encontrado." }, { status: 404 });
   }
 
-  await prisma.pad.delete({ where: { id } });
+  if (existing.isPrivate && existing.ownerId !== session.user.id) {
+    return NextResponse.json({ error: "Bloco nao encontrado." }, { status: 404 });
+  }
+
+  const deleted = await prisma.pad.deleteMany({
+    where: {
+      id,
+      OR: [{ isPrivate: false }, { ownerId: session.user.id }]
+    }
+  });
+
+  if (deleted.count === 0) {
+    return NextResponse.json({ error: "Bloco nao encontrado." }, { status: 404 });
+  }
 
   return NextResponse.json({ ok: true });
 }
